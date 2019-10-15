@@ -1,0 +1,14 @@
+{
+  "name": "tagfiles",
+  "version": "1.0.0",
+  "description": "Add tags to music files.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luca Pinelli",
+  "license": "ISC",
+  "dependencies": {
+    "mime": "^2.4.4"
+  }
+}

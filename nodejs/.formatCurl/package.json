@@ -1,0 +1,15 @@
+{
+  "name": "formatcurl",
+  "version": "1.0.0",
+  "description": "Format curl output.",
+  "main": "src/formatCurl.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luca Pinelli",
+  "license": "ISC",
+  "dependencies": {
+    "beautify": "^0.0.8",
+    "lodash": "^4.17.15"
+  }
+}

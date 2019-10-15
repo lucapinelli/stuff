@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+
+blue="\033[00;34m"
+reset="\033[00m"
+
+
+label() {
+    echo -e "\n${blue}$1${reset}\n";
+}
+
+help() {
+    echo -e "\nAvailable commands are:";
+    echo -e "  help";
+    echo -e "  status";
+    echo -e "  checkout <branch-name>";
+    echo -e "  log [text-filter]";
+    echo -e "  diff [--staged] <commit>";
+    echo -e "  restore <file/directory>";
+    echo -e "  mr [-a] <new-branch-name>";
+    echo -e "";
+}
+
+status() {
+    label "git branch"
+    git branch
+    label "git status"
+    git status
+    label "git stash list"
+    git stash list
+    label "git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*'"
+    git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*'
+}
+
+meldDiff() {
+    if (( $# < 1 )); then
+        echo -e "\nUsage:\n  igit meld <commit>\n\nExample:\n  igit meld HEAD\n";
+    else
+        label "git difftool --tool=meld --dir-diff $1"
+        git difftool --tool=meld --dir-diff $1;
+    fi
+}
+
+mr() {
+    if (( $# < 1 )); then
+        echo -e "\nUsage:\n  igit mr [-a] <new-branch-name>\n\nExample:\n  igit mr 'fix/smth'\n";
+    else
+        branchName="$1"
+        if [ "$1" = "-a" ]; then
+            branchName="$2"
+            label "git add ." && \
+            git add .
+        fi
+        label "git checkout -b $branchName" && \
+        git checkout -b $branchName && \
+        label "git commit -m $branchName" && \
+        git commit -m $branchName && \
+        label "git push --set-upstream origin $branchName" && \
+        git push --set-upstream origin $branchName;
+    fi
+}
+
+checkout() {
+    if (( $# < 1 )); then
+        echo -e "\nUsage:\n  igit checkout <branch-name>\n\nExample:\n  igit checkout development\n";
+    else
+        branchName="$1"
+        label "git stash" && \
+        git stash && \
+        label "git checkout $branchName" && \
+        git checkout $branchName && \
+        label "git pull" && \
+        git pull && \
+        label "git stash pop" && \
+        git stash pop && \
+        label "git status" && \
+        git status;
+    fi
+}
+
+log() {
+    if (( $# < 1 )); then
+      label "git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --max-count=60 | grep -v 'Merge' | tac"
+      git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --max-count=60 | grep -v 'Merge' | tac
+    else
+      label "git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M'  | grep $@ | grep -v 'Merge' | head -n 20 | tac"
+      git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M'  | grep $@ | grep -v 'Merge' | head -n 20 | tac
+    fi
+}
+
+restore() {
+    if (( $# < 1 )); then
+        echo -e "\nUsage:\n  igit restore <file/directory>\n\nExample:\n  igit restore yarn.lock\n";
+    else
+        path="$1"
+        label "git add $path" && \
+        git add $path && \
+        label "git reset HEAD $path" && \
+        git reset HEAD $path && \
+        label "git checkout $path" && \
+        git checkout $path
+    fi
+}
+
+pull() {
+  label "git pull"
+  git pull
+
+  status
+
+  olds=$(git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*' | wc -l)
+  if (( $olds > 0 )); then
+      read -p "Do you want to remove the merged branches? (yes/no) " yn
+      if [ "$yn" = "yes" ]; then
+          label "git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*' | xargs git branch -d"
+          git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*' | xargs git branch -d
+      fi
+  fi
+}
+
+
+if (( $# == 0 )); then
+    help
+elif [ "$1" = "help" ]; then
+    help
+elif [ "$1" = "status" ]; then
+    status
+elif [ "$1" = "pull" ]; then
+    pull
+elif [ "$1" = "checkout" ]; then
+    checkout "$2"
+elif [ "$1" = "diff" ]; then
+    meldDiff "$2"
+elif [ "$1" = "restore" ]; then
+    restore "$2"
+elif [ "$1" = "mr" ]; then
+    mr "$2" "$3"
+elif [ "$1" = "log" ]; then
+    log ${@:2}
+else
+    echo -e "\n\033[00;33mUnkown command $1${reset}\n";
+    help
+fi

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+function help {
+  echo ""
+  echo "  NAME"
+  echo "    allsubdir - exceutes the specified command in all the sub directories of the working directory"
+  echo ""
+  echo "  USAGE"
+  echo "    allsubdir COMMAND_STRING"
+  echo ""
+  echo "  EXAMPLES"
+  echo "    allsubdir 'git pull'"
+  echo "    allsubdir 'igit log | grep luca | grep 2019.10.10'"
+  echo ""
+}
+
+if (( $# != 1 )); then
+  help
+  exit
+fi
+
+if [ "$1" = "--help" ] || [ "$1" = "-help" ] || [ "$1" = "-h" ]; then
+  help
+  exit
+fi
+
+echo -e "\n\e[33m" && fortune | cowsay -f 'eyes' && echo -e " \e[39m\n"
+
+for d in *; do (
+  if [ -d "$d" ]; then
+    cd "$d" && \
+    dirname="$(pwd | sed 's|^.*/||g')"
+    eval $1 2>&1 | sed 's/^/'"$dirname"': /g' && \
+    echo
+  fi
+); done

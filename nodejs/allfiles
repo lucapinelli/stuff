@@ -1,0 +1,65 @@
+#!/usr/bin/env node
+
+const util = require('util');
+const child_process = require('child_process');
+const fs = require('fs');
+
+const exec = util.promisify(child_process.exec);
+
+const usage = `
+
+  NAME
+    allfiles - exceutes the specified command on all the files in the working directory
+
+  USAGE
+    allfiles COMMAND_STRING
+
+  EXAMPLE
+    allfiles 'stat'
+
+`
+
+async function asyncSeries(values, asyncCallback) {
+  let index = 0;
+  await values.reduce(async (promise, value) => {
+    await promise;
+    await asyncCallback(value, index);
+  }, Promise.resolve());
+}
+
+const main = async () => {
+
+    if (
+      process.argv.length !== 3
+      || process.argv[2] === '--help'
+      || process.argv[2] === '-help'
+      || process.argv[2] === '-h'
+    ) {
+        console.log(usage);
+        return;
+    }
+
+    console.log('arguments', process.argv);
+    const files = fs.readdirSync('.');
+    asyncSeries(files, async (file) => {
+        const stat = fs.statSync(file);
+        if (stat.isFile()) {
+            const command = `${process.argv[2]} "${file}"`;
+            try {
+                console.log('EXECUTE: ', command);
+                const out = await exec(command);
+                if (out.stdout) {
+                    console.log(out.stdout);
+                }
+                if (out.stderr) {
+                    console.log(out.stderr);
+                }
+            } catch (e) {
+                console.log('ERROR');
+                console.log(e);
+            }
+        }
+    });
+}
+
+main().catch(e => console.log('An error occured:', e));
