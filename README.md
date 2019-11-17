@@ -50,6 +50,25 @@ function set_title {
   fi
 }
 
+
+/*
+ * Compiles and runs a Rust script (without Cargo)
+ */
+function rustrun {
+    name=$(echo $1 | sed 's/\.rs$//') \
+    && echo "# FORMAT: rustfmt $1" \
+    && rustfmt $1 \
+    && echo "# COMPILE: rustc -O $1 && strip $name" \
+    && rustc -O $1 && strip "$name" \
+    && size=$(du -hs "$name" | sed -r 's/^([0-9]+[A-Z]).*$/\1/g') \
+    && echo "binary size: $size" \
+    && echo \
+    && echo "# RUN: time ./${name}" \
+    && echo \
+    && time "./${name}"
+}
+
+
 ### Alias
 
 alias hat='bat --style=header'
