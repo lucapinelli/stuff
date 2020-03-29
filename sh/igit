@@ -21,10 +21,8 @@ help() {
 }
 
 status() {
-    label "git branch"
-    git branch
     label "git status"
-    git status
+    git status -sb
     label "git stash list"
     git stash list
     label "git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*'"

@@ -39,12 +39,14 @@ const main = async () => {
         return;
     }
 
-    console.log('arguments', process.argv);
     const files = fs.readdirSync('.');
     asyncSeries(files, async (file) => {
         const stat = fs.statSync(file);
+        const cmd = process.argv[2];
         if (stat.isFile()) {
-            const command = `${process.argv[2]} "${file}"`;
+            let command = cmd.includes('{}')
+              ? cmd.replace(/{}/g, file)
+              : `${cmd} "${file}"`;
             try {
                 console.log('EXECUTE: ', command);
                 const out = await exec(command);
