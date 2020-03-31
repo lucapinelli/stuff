@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+blue="\033[00;34m"
+reset="\033[00m"
+
+HELP='
+
+USAGE:
+
+    fd [ACTION] [search_pattern]
+
+ACTIONS:
+
+  l, list
+    lists all the snippets with a name that matches the pattern
+
+  g, grep
+    uses rg to grep the text inside all the snippets
+
+  s, show
+    shows all the snippets with a name that matches the pattern
+
+  e, edit
+    opens the vi editor to edit the first snippet with a name that matches the
+    pattern
+
+  a, atom
+    opens the Atom editor to edit all the snippets with a name that matches the
+    pattern
+
+  o, open
+    opens the root folder of the snippets using the Atom editor
+
+  h, help
+    shows this help
+
+EXAMPLES:
+
+  # Lists all the file and folders
+  snippets list ".*"
+
+  # Grep the world "bash" in all the files
+  snippets grep "env bash"
+
+  # Show all the snippets that contains "move to"
+  snippets show "move to"
+
+  # Show all the snippets that contains "move to"
+  snippets show "move to"
+
+  # Edit (using vi) the first snippet that is a json (.json) and with a name
+  # that contains "message"
+  snippets edit -e json "message"
+
+  # Edit (using Atom) all the snippets type json (the extension is .json)
+  snippets atom -e json ".*"
+
+  # opens the root folder of the snippets using the Atom editor
+  snippets open
+
+DEPENDENCIES:
+
+  fd - https://github.com/sharkdp/fd
+  rg - https://github.com/BurntSushi/ripgrep
+  vi - https://www.vim.org/
+  atom - https://atom.io/
+
+  The root folder that contains all the snippets must be located at ~/snippets
+
+'
+
+case "$1" in
+  "list" | "l")
+    fd ${@:2:$#-2} "${@: -1}" ~/snippets
+  ;;
+  "grep" | "g")
+    rg ${@:2:$#-2} "${@: -1}" ~/snippets
+  ;;
+  "show" | "s")
+    #fd ${@:2:$#-2} "${@: -1}" ~/snippets -exec more
+    fd ${@:2:$#-2} "${@: -1}" ~/snippets --exec-batch bat --style=header
+  ;;
+  "edit" | "e")
+    vi "$(fd ${@:2:$#-2} "${@: -1}" ~/snippets | head -1)"
+  ;;
+  "atom" | "a")
+    atom "$(fd ${@:2:$#-2} "${@: -1}" ~/snippets | head -1)"
+  ;;
+  "open" | "o")
+    atom ~/snippets
+  ;;
+  *)
+    echo -e "$HELP"
+  ;;
+esac
