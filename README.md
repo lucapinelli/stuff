@@ -73,7 +73,7 @@ function rustrun {
 
 alias hat='bat --style=header'
 alias ..='cd ..'
-alias stuff='fortune | cowsay -f `ls /usr/share/cowsay/cows/ | shuf -n 1`'
+alias saysomething='fortune | cowsay -f `ls /usr/share/cowsay/cows/ | shuf -n 1`'
 
 ### PATH
 
