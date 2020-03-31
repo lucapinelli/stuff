@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-blue="\033[00;34m"
-reset="\033[00m"
-
 HELP='
 
 USAGE:
@@ -68,32 +65,28 @@ DEPENDENCIES:
 '
 
 if [ -z $SNIPPETS_HOME ]; then
-  echo "the variable SNIPPETS_HOME is not set";
-else
-  echo "the variable SNIPPETS_HOME is set to $SNIPPETS_HOME";
+  SNIPPETS_HOME=~/snippets
 fi
-
-exit
 
 case "$1" in
   "list" | "l")
-    fd ${@:2:$#-2} "${@: -1}" ~/snippets
+    fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME"
   ;;
   "grep" | "g")
-    rg ${@:2:$#-2} "${@: -1}" ~/snippets
+    rg ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME"
   ;;
   "show" | "s")
     #fd ${@:2:$#-2} "${@: -1}" ~/snippets -exec more
-    fd ${@:2:$#-2} "${@: -1}" ~/snippets --exec-batch bat --style=header
+    fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header
   ;;
   "edit" | "e")
-    vi "$(fd ${@:2:$#-2} "${@: -1}" ~/snippets | head -1)"
+    vi "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "atom" | "a")
-    atom "$(fd ${@:2:$#-2} "${@: -1}" ~/snippets | head -1)"
+    atom "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "open" | "o")
-    atom ~/snippets
+    atom "$SNIPPETS_HOME"
   ;;
   *)
     echo -e "$HELP"
