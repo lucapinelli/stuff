@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+/opt/apps/android-studio/bin/studio.sh $@ &
+
