@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+snippets ${@:1:$#-1} "${@: -1}"
+SNIPPETS_HOME=~/projects/my/notes snippets ${@:1:$#-1} "${@: -1}"
+SNIPPETS_HOME=~/projects/my/stuff snippets ${@:1:$#-1} "${@: -1}"
