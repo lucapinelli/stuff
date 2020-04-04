@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 
+HELP="
+NAME
+  allsubdir - exceutes the specified command in all the sub directories of the working directory
+
+USAGE
+  allsubdir \"COMMAND_STRING\"
+
+EXAMPLES
+  allsubdir 'git pull'
+  allsubdir 'igit log | grep luca | grep 2019.10.10'
+"
+
 function help {
-  echo ""
-  echo "  NAME"
-  echo "    allsubdir - exceutes the specified command in all the sub directories of the working directory"
-  echo ""
-  echo "  USAGE"
-  echo "    allsubdir COMMAND_STRING"
-  echo ""
-  echo "  EXAMPLES"
-  echo "    allsubdir 'git pull'"
-  echo "    allsubdir 'igit log | grep luca | grep 2019.10.10'"
-  echo ""
+  echo "$HELP"
 }
 
 if (( $# != 1 )); then
@@ -23,8 +25,6 @@ if [ "$1" = "--help" ] || [ "$1" = "-help" ] || [ "$1" = "-h" ]; then
   help
   exit
 fi
-
-echo -e "\n\e[33m" && fortune | cowsay -f 'eyes' && echo -e " \e[39m\n"
 
 for d in *; do (
   if [ -d "$d" ]; then
