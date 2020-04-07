@@ -156,7 +156,7 @@ list() {
 
   case "$1" in
     "untracked" | "?")
-      git status -sb | grep '^[?][?] ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+      git status -sb | grep '^[?][?] ' | sed -r 's/.. "?([^"]*)"?/"\1"/g' | tr '\n' ' '
       ;;
 
     "added" | "A")
