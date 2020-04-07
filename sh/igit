@@ -37,6 +37,13 @@ ACTIONS:
   restore <file/directory>
     restore the specified file/directory to the original content
 
+  list [OPT]
+    list file that has been:
+    ?, untraked
+    A, added
+    M, modified
+    D, deleted
+
   help
     show this help
 "
@@ -50,7 +57,7 @@ label() {
 }
 
 status() {
-  label "git status"
+  label "git status -sb"
   git status -sb
   label "git stash list"
   git stash list
@@ -143,6 +150,31 @@ restore() {
   git checkout $path
 }
 
+list() {
+  # if $1 is empty print the help and exit
+  if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
+
+  case "$1" in
+    "untracked" | "?")
+      git status -sb | grep '^[?][?] ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+      ;;
+
+    "added" | "A")
+      git status -sb | grep '^A  ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+      ;;
+
+    "modified" | "M")
+      git status -sb | grep '^ M ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+      ;;
+
+    "deleted" | "D")
+      git status -sb | grep '^ D ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+      ;;
+    *)
+      echo -e "$WRONG_SYNTAX"; exit ;;
+  esac
+  echo ""
+}
 
 case "$1" in
   "status")
@@ -161,6 +193,8 @@ case "$1" in
     checkout "$2" ;;
   "restore")
     restore "$2" ;;
+  "list")
+    list "$2" ;;
   *)
     echo "$HELP" ;;
 esac
