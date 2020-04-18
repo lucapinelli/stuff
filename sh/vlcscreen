@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+blue="\033[00;34m"
+reset="\033[00m"
+
+HELP="
+
+USAGE:
+
+  vlcscreen <action> [screen]
+
+OPTIONS:
+
+  action
+    valid values are:
+    * start, starts ExtraMaus and VLC to cast the screens
+    * kill, kills ExtraMaus and VLC
+
+  screen
+    the screen to cast with VLC (valid values are 1 or 2, as default all the screens are used)
+
+DEPENDENCIES:
+
+    vlc -- https://www.videolan.org/vlc/
+    extramaus -- http://dodger-tools.sourceforge.net/cms/index.php?id=100000201
+
+"
+
+run() {
+  echo -e "${blue}$1${reset}"
+  eval "$1"
+}
+
+start() {
+  run "extramaus &"
+
+  vlc="vlc screen:// --screen-fps=10 --no-video-deco --no-embedded-video"
+  if [ -z "$1" ]; then
+    run "$vlc &"
+  else
+    firstScreenWidth=$(xrandr | grep '*' | head -n 1 | sed 's/^[^0-9]*\([0-9]*\).*$/\1/g')
+    case "$1" in
+      "1")
+        run "$vlc --screen-width=${firstScreenWidth} &"
+        ;;
+      "2")
+        run "$vlc --screen-left=${firstScreenWidth} &"
+        ;;
+      *) echo "$HELP" ;;
+    esac
+  fi
+}
+
+kill_all() {
+  run "pkill vlc"
+  run "pkill extramaus"
+}
+
+case "$1" in
+  "start") start $2 ;;
+  "kill") kill_all ;;
+  *) echo "$HELP" ;;
+esac
+
