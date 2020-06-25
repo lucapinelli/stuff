@@ -141,7 +141,7 @@ restore() {
   # if $1 is empty print the help and exit
   if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
 
-  path="$1"
+  path="$@"
   label "git add $path" && \
   git add $path && \
   label "git reset HEAD $path" && \
@@ -192,7 +192,7 @@ case "$1" in
   "checkout")
     checkout "$2" ;;
   "restore")
-    restore "$2" ;;
+    restore ${@:2} ;;
   "list")
     list "$2" ;;
   *)
