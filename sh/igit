@@ -141,13 +141,15 @@ restore() {
   # if $1 is empty print the help and exit
   if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
 
-  path="$@"
-  label "git add $path" && \
-  git add $path && \
-  label "git reset HEAD $path" && \
-  git reset HEAD $path && \
-  label "git checkout $path" && \
-  git checkout $path
+  paths="$@"
+  label "git reset HEAD $paths" && \
+  git reset HEAD $paths && \
+  label "git add $paths" && \
+  git add $paths && \
+  label "git reset HEAD $paths" && \
+  git reset HEAD $paths && \
+  label "git checkout $paths" && \
+  git checkout $paths
 }
 
 list() {

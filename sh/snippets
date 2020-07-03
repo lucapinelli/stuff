@@ -17,6 +17,10 @@ ACTIONS:
   s, show
     shows all the snippets with a name that matches the pattern
 
+  c, clip
+    copies in the clipboard the first snippet with a name that matches the
+    pattern
+
   e, edit
     opens the vi editor to edit the first snippet with a name that matches the
     pattern
@@ -78,6 +82,10 @@ case "$1" in
   "show" | "s")
     #fd ${@:2:$#-2} "${@: -1}" ~/snippets -exec more
     fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header
+  ;;
+  "clip" | "c")
+    xclip -selection c < "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    bat "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)" 
   ;;
   "edit" | "e")
     vi "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
