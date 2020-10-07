@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+titles=(beep_beep beep ok peace smile zen koi)
+size=${#titles[@]}
+
+HELP="
+
+USAGE:
+
+    art [title]
+
+Available titles are:
+$(for title in "${titles[@]}"; do echo "* $title"; done)
+
+If no title is specified a random one will be selected.
+
+"
+
+case "$1" in
+  "")
+    cat $(dirname "${BASH_SOURCE[0]}")/../ascii_art/${titles[$((RANDOM % size))]}.txt
+    echo
+  ;;
+  *)
+    path="$(dirname "${BASH_SOURCE[0]}")/../ascii_art/$1.txt"
+    if [ -f "$path" ]; then
+      cat "$path"
+      echo
+    else
+      echo -e "$HELP"
+    fi
+  ;;
+esac
+
+# to automatically create colored ASCII art use:
+# script -c 'asciiart -w 64 -c parasite05_4.png' parasite.txt
+# or
+# script -c 'image parasite05_4.png' parasite.txt

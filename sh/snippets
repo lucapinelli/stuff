@@ -4,7 +4,7 @@ HELP='
 
 USAGE:
 
-    fd [ACTION] [search_pattern]
+    snippets [ACTION] [search_pattern]
 
 ACTIONS:
 
@@ -85,7 +85,7 @@ case "$1" in
   ;;
   "clip" | "c")
     xclip -selection c < "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
-    bat "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)" 
+    bat "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "edit" | "e")
     vi "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
