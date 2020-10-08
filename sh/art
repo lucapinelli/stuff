@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-titles=(beep_beep beep ok peace smile zen koi)
+titles=(beep ok peace smile zen koi)
 size=${#titles[@]}
 
 HELP="
