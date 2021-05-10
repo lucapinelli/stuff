@@ -10,6 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "beautify": "^0.0.8",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.21"
   }
 }
