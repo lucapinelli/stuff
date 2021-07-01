@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-blue="\033[00;34m"
-reset="\033[00m"
-
-echo -e "${blue}executing '$@' using '/opt/alternative-home/home_plain' as home directory${reset}\n";
-
-HOME=/opt/alternative-home/home_plain $@

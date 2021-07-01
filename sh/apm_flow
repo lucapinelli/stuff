@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+blue="\033[00;34m"
+reset="\033[00m"
+
+echo -e "${blue}ATOM_HOME=/opt/alternative-home/atom_flow atom $@ ${reset}\n";
+
+ATOM_HOME=/opt/alternative-home/atom_flow apm $@

@@ -7,8 +7,9 @@ NAME
 USAGE
   rename FILE_NAME REGEX
 
-EXAMPLE
-  find -type f -name '*.jpeg' -exec rename.sh {} 's/.jpeg$\.jpg' \;
+EXAMPLES
+  find -type f -name '*.jpeg' -exec rename.sh {} 's/.jpeg$/\.jpg' \;
+  fd --type file .png$ -exec rename.sh {} 's|/G00|/GOH|'
 "
 
 if (( $# != 2 )); then
@@ -17,3 +18,4 @@ if (( $# != 2 )); then
 fi
 
 mv "$1" "$(echo $1 | sed $2)"
+

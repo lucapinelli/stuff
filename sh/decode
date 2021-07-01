@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [[ -z "${MYSECRET}" ]]; then
+  echo "
+  You need to define and export the environment variable MYSECRET, e.g.:
+
+  export MYSECRET=faisilenzio@cg
+  "
+  exit
+fi
+
+echo $1 | openssl aes-256-cbc -d -a -pbkdf2 -pass env:MYSECRET
