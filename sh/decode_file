@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [[ -z "$2" ]]; then
+  echo "
+  SYNOPSY
+  decode_file FILE_TO_DECODE FILE_TO_ENCODE
+  "
+  exit
+fi
+
+openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -out "$2"
