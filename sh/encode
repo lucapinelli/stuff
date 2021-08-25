@@ -4,7 +4,7 @@ if [[ -z "${MYSECRET}" ]]; then
   echo "
   You need to define and export the environment variable MYSECRET, e.g.:
 
-  export MYSECRET=faisilenzio@cg
+  export MYSECRET=dontspeaktwice
   "
   exit
 fi

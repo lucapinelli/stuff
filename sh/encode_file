@@ -1,11 +1,24 @@
 #!/usr/bin/env bash
 
+set -e # -e  exit immediately when a command fails
+
+
 if [[ -z "$2" ]]; then
   echo "
   SYNOPSY
-  encode_file FILE_TO_ENCODE FILE_TO_DECODE
+  encode_file FILE_TO_ENCODE FILE_DECODED
+
+  You can define and export the environment variable MYSECRET
+  to encode /decode multiple files using the same password, e.g.:
+  export MYSECRET=dontspeaktwice
   "
   exit
 fi
 
-openssl aes-256-cbc -a -salt -pbkdf2 -in "$1" -out "$2"
+if [[ -z "${MYSECRET}" ]]; then
+  set -x # -x  print each command before executing it
+  openssl aes-256-cbc -a -salt -pbkdf2 -in "$1" -out "$2"
+else
+  set -x # -x  print each command before executing it
+  openssl aes-256-cbc -a -salt -pbkdf2 -in "$1" -out "$2" -pass env:MYSECRET
+fi
