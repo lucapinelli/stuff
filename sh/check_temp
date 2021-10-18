@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+check_sensor_temp() {
+  retries=$1
+  max=0
+  while IFS= read -r value; do
+    if (( value > max )); then
+      max=$value
+    fi
+  done <<< "$(sensors -u 2> /dev/null | grep input | sed 's/^.*\: \([^\.]*\).*$/\1/g')"
+
+  if (( max > 77 )); then
+    notify-send -i /usr/share/icons/elementary-xfce/status/symbolic/dialog-warning-symbolic.svg \
+      "High Temperature" \
+      "Current temperature is ${max}°C"
+    paplay /usr/share/sounds/purple/alert.wav
+    echo "$(date) -- (${retries}) Higher temperature: ${max}°C"
+    if (( retries > 1 )); then
+      sleep 11
+      check_sensor_temp $(($retries - 1))
+    fi
+  else
+    echo "$(date) -- Higher temperature: ${max}°C"
+  fi
+}
+
+check_sensor_temp 5
+
+#
+# Edit the crontab using `crontab -e` to add the following job:
+#
+# # Runs every minute (see https://www.tutorialspoint.com/unix_commands/crontab.htm)
+# * * * * * XDG_RUNTIME_DIR=/run/user/$(id -u) /home/luca/projects/my/stuff/sh/check_temp 2> /tmp/check-temp-error.log 1> /tmp/check-temp.log
+# # XDG_RUNTIME_DIR=/run/user/$(id -u) -- this is required only if the script has to run notify-send
+# # 2> /tmp/check-temp-error.log       -- this will write the errors in the file /tmp/check-temp-error.log
+# # 1> /tmp/check-temp.log             -- this will write the output in the file /tmp/check-temp.log
+#
