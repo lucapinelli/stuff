@@ -55,10 +55,12 @@ const main = async () => {
     for (let i = 0; i < list.length; ++i) {
       file = list[i]
       rename = file.replace(new RegExp(search), replace)
-      log.info('🤖 file       %s', file)
-      log.info('   renamed as %s\n', rename)
-      if (!argv.simulate) {
-        await $`mv ${file} ${rename}`
+      if (file !== rename) {
+        log.info('🤖 file       %s', file)
+        log.info('   renamed as %s\n', rename)
+        if (!argv.simulate) {
+          await $`mv ${file} ${rename}`
+        }
       }
     }
   } catch (error) {
