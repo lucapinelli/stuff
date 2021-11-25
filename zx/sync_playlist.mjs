@@ -8,7 +8,7 @@ $.verbose = false
 const showHelp = () => {
   console.info(`
 USAGE:
-  sync_folder.mjs /media/Music/miscellaneous /media/phone/Music/miscellaneous
+  sync_playlist.mjs "Sunday morning.m3u" "/media/luca/NABAIJI MP3"
 `)
 }
 
@@ -22,18 +22,20 @@ const forEach = async (list, asyncFn) => {
 }
 
 const { help, h } = argv
-const [scriptPath, source, dest] = argv._ // eslint-disable-line no-unused-vars
+const [scriptPath, playlist, dest] = argv._ // eslint-disable-line no-unused-vars
+
+const getFileName = filePath => filePath.replace(/^.*\/([^/]+)$/, '$1')
 
 const main = async () => {
-  if (help || h || !source || !dest) {
+  if (help || h || !playlist || !dest) {
     showHelp()
     return
   }
-  const sourceFiles = (await $`ls ${source}`).stdout.split('\n').filter(Boolean)
+  const sourceFiles = (await $`cat ${playlist}`).stdout.split('\n').filter(Boolean)
   const destFiles = (await $`ls ${dest}`).stdout.split('\n').filter(Boolean)
 
-  const toCopy = sourceFiles.filter(file => !destFiles.find(f => f === file))
-  const toDelete = destFiles.filter(file => !sourceFiles.find(f => f === file))
+  const toCopy = sourceFiles.filter(file => !destFiles.find(f => f === getFileName(file)))
+  const toDelete = destFiles.filter(file => !sourceFiles.find(f => getFileName(f) === file))
 
   toCopy.forEach(file => console.info('copy', file))
   toDelete.forEach(file => console.info('delete', file))
@@ -57,7 +59,7 @@ const main = async () => {
     console.info(file, 'deleted')
   })
   await forEach(toCopy, async file => {
-    await $`cp ${source + '/' + file} ${dest + '/' + file}`
+    await $`cp ${file} ${dest + '/' + getFileName(file)}`
     console.info(file, 'copied')
   })
 

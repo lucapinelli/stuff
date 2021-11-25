@@ -16,16 +16,35 @@ If no title is specified a random one will be selected.
 
 "
 
+colors=(
+  # "\033[00;30m" # black
+  "\033[00;31m" # red
+  "\033[00;32m" # green
+  "\033[00;33m" # yellow
+  "\033[00;34m" # blue
+  "\033[00;35m" # purple
+  "\033[00;36m" # cyan
+  "\033[00;37m" # white
+)
+reset="\033[00m"
+
+# for color in "${colors[@]}"
+# do
+#   echo -e "${color} test color ${reset}"
+# done
+
 case "$1" in
   "")
+    echo -e "${colors[$((RANDOM % 7))]}"
     cat $(dirname "${BASH_SOURCE[0]}")/../ascii_art/${titles[$((RANDOM % size))]}.txt
-    echo
+    echo -e "${reset}"
   ;;
   *)
     path="$(dirname "${BASH_SOURCE[0]}")/../ascii_art/$1.txt"
     if [ -f "$path" ]; then
+      echo -e "${colors[$((RANDOM % 7))]}"
       cat "$path"
-      echo
+      echo -e "${reset}"
     else
       echo -e "$HELP"
     fi
