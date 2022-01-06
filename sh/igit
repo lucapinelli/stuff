@@ -37,6 +37,9 @@ ACTIONS:
   restore <file/directory>
     restore the specified file/directory to the original content
 
+  apply <file.patch>
+    applyes the specified patch
+
   list [OPT]
     list file that has been:
     ?, untraked
@@ -152,6 +155,15 @@ restore() {
   git checkout $paths
 }
 
+apply() {
+  # if $1 is empty print the help and exit
+  if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
+
+  patch_file="$1"
+  label "git apply --3way --ignore-space-change --ignore-whitespace \"$patch_file\"" && \
+  git apply --3way --ignore-space-change --ignore-whitespace "$patch_file"
+}
+
 list() {
   # if $1 is empty print the help and exit
   if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
@@ -195,6 +207,8 @@ case "$1" in
     checkout "$2" ;;
   "restore")
     restore ${@:2} ;;
+  "apply")
+    apply "$2" ;;
   "list")
     list "$2" ;;
   *)

@@ -16,9 +16,7 @@ if [[ -z "$2" ]]; then
 fi
 
 if [[ -z "${MYSECRET}" ]]; then
-  set -x # -x  print each command before executing it
   openssl aes-256-cbc -a -salt -pbkdf2 -in "$1" -out "$2"
 else
-  set -x # -x  print each command before executing it
   openssl aes-256-cbc -a -salt -pbkdf2 -in "$1" -out "$2" -pass env:MYSECRET
 fi

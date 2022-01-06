@@ -1,21 +1,30 @@
 #!/usr/bin/env bash
 
-if [[ -z "$2" ]]; then
+if [[ -z "$1" || "$1" == "--help" ]]; then
   echo "
   SYNOPSY
-  decode_file FILE_TO_DECODE FILE_ENCODED
+  decode_file FILE_TO_DECODE [FILE_ENCODED]
 
   You can define and export the environment variable MYSECRET
   to encode /decode multiple files using the same password, e.g.:
   export MYSECRET=dontspeaktwice
+
+  If the FILE_ENCODED parameter is not specified the output will
+  be print on the stdout.
   "
   exit
 fi
 
 if [[ -z "${MYSECRET}" ]]; then
-  set -x # -x  print each command before executing it
-  openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -out "$2"
+  if [[ -z "$1" ]]; then
+    openssl aes-256-cbc -d -a -pbkdf2 -in "$1"
+  else
+    openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -out "$2"
+  fi
 else
-  set -x # -x  print each command before executing it
-  openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -out "$2" -pass env:MYSECRET
+  if [[ -z "$1" ]]; then
+    openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -out "$2" -pass env:MYSECRET
+  else
+    openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -pass env:MYSECRET
+  fi
 fi
