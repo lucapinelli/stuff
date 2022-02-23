@@ -8,3 +8,32 @@ reset="\033[00m"
 echo -e "${blue}ATOM_HOME=/opt/alternative-home/atom_rust atom $@ ${reset}\n";
 
 ATOM_HOME=/opt/alternative-home/atom_rust atom $@
+
+# $ export ATOM_HOME=/opt/alternative-home/atom_rust
+# $ echo -e "apm install \\ \n $(apm list --installed --bare | sd '@.*' '' | sd '\n' ' \\\n ')"
+# apm install \
+#  atom-beautify \
+#  atom-ide-base \
+#  atom-ide-code-format \
+#  atom-ide-datatip \
+#  atom-ide-definitions \
+#  atom-ide-hyperclick \
+#  atom-ide-markdown-service \
+#  atom-ide-outline \
+#  atom-ide-signature-help \
+#  busy-signal \
+#  highlight-selected \
+#  ide-rust \
+#  intentions \
+#  language-docker \
+#  language-freemarker \
+#  language-graphql \
+#  language-ini \
+#  language-nginx \
+#  linter \
+#  linter-ui-default \
+#  markdown-preview-plus \
+#  open-terminal-here \
+#  simple-copy-path \
+#  sort-lines \
+#  teletype \

@@ -10,20 +10,21 @@ echo -e "${blue}ATOM_HOME=/opt/alternative-home/atom++ atom $@ ${reset}\n";
 ATOM_HOME=/opt/alternative-home/atom++ atom $@
 
 # $ export ATOM_HOME=/opt/alternative-home/atom++
-# $ apm list --installed --bare | sd '@.*' ''
-# atom-beautify
-# highlight-selected
-# language-diff
-# language-docker
-# language-freemarker
-# language-graphql
-# language-ini
-# language-nginx
-# last-cursor-position
-# linter-eslint
-# markdown-cell-highlight
-# markdown-preview-plus
-# open-terminal-here
-# simple-copy-path
-# sort-lines
-# teletype
+# $ echo -e "apm install \\ \n $(apm list --installed --bare | sd '@.*' '' | sd '\n' ' \\\n ')"
+# apm install \
+#  atom-beautify \
+#  highlight-selected \
+#  language-diff \
+#  language-docker \
+#  language-freemarker \
+#  language-graphql \
+#  language-ini \
+#  language-nginx \
+#  last-cursor-position \
+#  linter-eslint \
+#  markdown-cell-highlight \
+#  markdown-preview-plus \
+#  open-terminal-here \
+#  simple-copy-path \
+#  sort-lines \
+#  teletype \

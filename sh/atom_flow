@@ -8,3 +8,18 @@ reset="\033[00m"
 echo -e "${blue}ATOM_HOME=/opt/alternative-home/atom_flow atom $@ ${reset}\n";
 
 ATOM_HOME=/opt/alternative-home/atom_flow atom $@
+
+# $ export ATOM_HOME=/opt/alternative-home/atom_flow
+# $ echo -e "apm install \\ \n $(apm list --installed --bare | sd '@.*' '' | sd '\n' ' \\\n ')"
+# apm install \
+#  atom-ide-ui \
+#  highlight-selected \
+#  ide-flowtype \
+#  language-freemarker \
+#  language-graphql \
+#  language-ini \
+#  linter \
+#  linter-eslint \
+#  simple-copy-path \
+#  sort-lines \
+#  teletype \

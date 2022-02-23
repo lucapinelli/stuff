@@ -8,3 +8,9 @@ reset="\033[00m"
 echo -e "${blue}ATOM_HOME=/opt/alternative-home/atom_java atom $@ ${reset}\n";
 
 ATOM_HOME=/opt/alternative-home/atom_java atom $@
+
+# $ export ATOM_HOME=/opt/alternative-home/atom_java
+# $ echo -e "apm install \\ \n $(apm list --installed --bare | sd '@.*' '' | sd '\n' ' \\\n ')"
+# apm install \
+# atom-ide-ui \
+# ide-java \
