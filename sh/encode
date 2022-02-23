@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-if [[ -z "${MYSECRET}" ]]; then
+if [[ -z "${SECRET}" ]]; then
   echo "
-  You need to define and export the environment variable MYSECRET, e.g.:
+  You need to define and export the environment variable SECRET, e.g.:
 
-  export MYSECRET=dontspeaktwice
+  export SECRET=dontspeaktwice
   "
   exit
 fi
 
-echo $1 | openssl aes-256-cbc -a -salt -pbkdf2 -pass env:MYSECRET
+echo $1 | openssl aes-256-cbc -a -salt -pbkdf2 -pass env:SECRET

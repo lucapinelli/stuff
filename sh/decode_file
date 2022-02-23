@@ -3,28 +3,28 @@
 if [[ -z "$1" || "$1" == "--help" ]]; then
   echo "
   SYNOPSY
-  decode_file FILE_TO_DECODE [FILE_ENCODED]
+  decode_file FILE_TO_DECODE [FILE_DECODED]
 
-  You can define and export the environment variable MYSECRET
+  You can define and export the environment variable SECRET
   to encode /decode multiple files using the same password, e.g.:
-  export MYSECRET=dontspeaktwice
+  export SECRET=dontspeaktwice
 
-  If the FILE_ENCODED parameter is not specified the output will
+  If the FILE_DECODED parameter is not specified the output will
   be print on the stdout.
   "
   exit
 fi
 
-if [[ -z "${MYSECRET}" ]]; then
-  if [[ -z "$1" ]]; then
+if [[ -z "${SECRET}" ]]; then
+  if [[ -z "$2" ]]; then
     openssl aes-256-cbc -d -a -pbkdf2 -in "$1"
   else
     openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -out "$2"
   fi
 else
-  if [[ -z "$1" ]]; then
-    openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -out "$2" -pass env:MYSECRET
+  if [[ -z "$2" ]]; then
+    openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -pass env:SECRET
   else
-    openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -pass env:MYSECRET
+    openssl aes-256-cbc -d -a -pbkdf2 -in "$1" -out "$2" -pass env:SECRET
   fi
 fi

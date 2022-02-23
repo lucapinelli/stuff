@@ -8,4 +8,3 @@ reset="\033[00m"
 echo -e "${blue}ATOM_HOME=/opt/alternative-home/atom_java atom $@ ${reset}\n";
 
 ATOM_HOME=/opt/alternative-home/atom_java atom $@
-d

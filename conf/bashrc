@@ -1,0 +1,128 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# ...
+# meld ~/.bashrc conf/bashrc
+
+###################
+# <luca was here> #
+###################
+
+### Completion and Colorize
+
+if [ "$(whoami)" != "root" ]; then
+  PS1='${debian_chiroot:+($debian_chroot)}'
+  PS1=$PS1'\[\033[00;36m\]$(date +"%H:%M:%S") '
+  PS1=$PS1'\[\033[00;32m\]\u@\h '
+  PS1=$PS1'\[\033[01;34m\]\w'
+  PS1=$PS1'\[\033[00;34m\]$(__git_ps1)'
+  PS1=$PS1'\[\033[00m\] \$ '
+else
+  PS1='${debian_chiroot:+($debian_chroot)}'
+  PS1=$PS1'\[\033[00;36m\]$(date +"%H:%M:%S") '
+  PS1=$PS1'\[\033[00;33m\]\u@\h '
+  PS1=$PS1'\[\033[01;34m\]\w'
+  PS1=$PS1'\[\033[00;34m\]$(__git_ps1)'
+  PS1=$PS1'\[\033[00m\] \$ '
+fi
+
+# If this is an xterm set the window title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+#
+# sets the terminal title
+#
+function title {
+  if [ "$1" == "--help" ] || [ "$1" == "-help" ] || [ "$1" == "-h" ]; then
+    echo -e "\nUsage:\n  set_title [title]\n";
+  else
+    if [[ -z "$ORIG" ]]; then
+      ORIG=$PS1
+    fi
+
+    if (( $# < 1 )); then
+      TITLE="\[\e]2;${PWD##*/}\a\]"
+    else
+      TITLE="\[\e]2;$*\a\]"
+    fi
+
+    PS1=${ORIG}${TITLE}
+  fi
+}
+
+function dict {
+  curl "https://api.dictionaryapi.dev/api/v2/entries/en/$1" \
+  | formatCurl \
+  | bat --language JavaScript --paging=never --style=plain
+}
+
+function wait_get {
+  echo -n "GET $1 ..."
+  count=0
+  http_status=$(curl -o /dev/null -s -w "%{http_code}\n" $1 || echo "ignore error" > /dev/null)
+  while [ "$http_status" != "$2" ]
+  do
+    count=$((count + 1))
+    if (( count > 60 )); then
+        error "startup failed: check_url \"$1\" timed out"
+    fi
+    sleep 3
+    echo -n "."
+    http_status=$(curl -o /dev/null -s -w "%{http_code}\n" $1 || echo "ignore error" > /dev/null)
+  done
+  echo " $2"
+}
+
+function show_alias {
+  echo -en "\033[00;34m⚙ " # set color blue and print '+' without new line
+  alias $1 | sd '^[^=]*=' '' | sd '^[^;]*; *' ''  | sd '.$' ''
+  echo -e '\033[00m' # reset the color
+}
+
+### Alias
+
+alias ll='show_alias ll; ls -halF'
+alias hat='show_alias hat; bat --style=header'
+alias ..='cd ..'
+alias ...='..; ..'
+alias ....='..; ..; ..'
+alias trash_list='show_alias trash_list; ls -1 /home/$USER/.local/share/Trash/files'
+alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
+alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
+alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | rg ' install'"
+# use apt_history -B 1 to print the dates
+
+alias clip='show_alias clip; xclip -selection c -i' # copy the content of the file in the clipboard
+alias clip_save='show_alias clip_save; xclip -selection c -o >' # copy the content of the clipboard in a file
+alias xt='show_alias xt; xterm -fa monaco -fs 10 -fg rgb:BB/90/90 -bg rgb:3B/10/10  -geometry 100x8'
+alias saysomething='show_alias saysomething; fortune | cowsay -f `ls /usr/share/cowsay/cows/ | shuf -n 1`'
+alias speak='show_alias speak; espeak -g 4 -s 110'
+alias xopen='show_alias xopen; xdg-open'
+alias youtube-mp3='show_alias youtube-mp3; youtube-dl --extract-audio --audio-format mp3'
+
+alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -framerate 8 -f x11grab -i :0+0:0 -video_size 1920x1080'
+alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'
+alias ffdisplay2small='show_alias ffdisplay2small; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 1920x1080'
+alias ffwebcam='show_alias ffwebcam; ffplay -window_title "Webcam" -framerate 8 -f video4linux2 -i /dev/video0 -video_size 240x240'
+
+alias chrome_unsafe='
+google-chrome \
+  --user-data-dir=/opt/alternative-home/chrome_unsafe \
+  --ignore-certificate-errors \
+  --unsafely-treat-insecure-origin-as-secure=https://localhost
+'
+
+### Paths
+
+export PATH="$PATH:/home/luca/projects/my/stuff/sh:/home/luca/projects/my/stuff/zx:/home/luca/projects/my/stuff/nodejs:/opt/bin"
+
+####################
+# </luca was here> #
+####################
