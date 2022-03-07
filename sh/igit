@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e # e  exit if a commands returns a non-zero value
+
 blue="\033[00;34m"
 red="\033[00;31m"
 reset="\033[00m"

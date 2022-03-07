@@ -88,7 +88,7 @@ function show_alias {
 
 ### Alias
 
-alias ll='show_alias ll; ls -halF'
+alias ll='show_alias ll; exa -l'
 alias hat='show_alias hat; bat --style=header'
 alias ..='cd ..'
 alias ...='..; ..'
@@ -101,6 +101,11 @@ alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | 
 
 alias clip='show_alias clip; xclip -selection c -i' # copy the content of the file in the clipboard
 alias clip_save='show_alias clip_save; xclip -selection c -o >' # copy the content of the clipboard in a file
+alias jsonkv="jq -r '
+paths(scalars) as \$p
+  | [ ([\$p[] | tostring] | join(\".\")), (getpath(\$p) | tojson) ]
+  | join(\": \")
+'"
 alias xt='show_alias xt; xterm -fa monaco -fs 10 -fg rgb:BB/90/90 -bg rgb:3B/10/10  -geometry 100x8'
 alias saysomething='show_alias saysomething; fortune | cowsay -f `ls /usr/share/cowsay/cows/ | shuf -n 1`'
 alias speak='show_alias speak; espeak -g 4 -s 110'
