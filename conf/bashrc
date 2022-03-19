@@ -36,9 +36,7 @@ xterm*|rxvt*)
     ;;
 esac
 
-#
 # sets the terminal title
-#
 function title {
   if [ "$1" == "--help" ] || [ "$1" == "-help" ] || [ "$1" == "-h" ]; then
     echo -e "\nUsage:\n  set_title [title]\n";
@@ -55,6 +53,11 @@ function title {
 
     PS1=${ORIG}${TITLE}
   fi
+}
+
+# get the package that contains the command
+function which_package {
+  dpkg -S $(which $1)
 }
 
 function dict {
@@ -98,6 +101,8 @@ alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 Hig
 alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
 alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | rg ' install'"
 # use apt_history -B 1 to print the dates
+alias dpkg_history="show_alias dpkg_history; zcat /var/log/dpkg.log.*.gz | cat - /var/log/dpkg.log | grep -E 'install |upgrade |remove ' "
+alias git_untracked='git status --short --untracked-files | cut --delimiter=" " --fields=2'
 
 alias clip='show_alias clip; xclip -selection c -i' # copy the content of the file in the clipboard
 alias clip_save='show_alias clip_save; xclip -selection c -o >' # copy the content of the clipboard in a file
