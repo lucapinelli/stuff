@@ -91,7 +91,8 @@ function show_alias {
 
 ### Alias
 
-alias ll='show_alias ll; exa -l'
+alias l='ls --group-directories-first'
+alias ll='show_alias ll; ls -oh --group-directories-first'
 alias hat='show_alias hat; bat --style=header'
 alias ..='cd ..'
 alias ...='..; ..'
