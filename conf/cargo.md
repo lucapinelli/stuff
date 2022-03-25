@@ -20,6 +20,14 @@ Cli system monitor.
 cargo install bottom
 ```
 
+### procs
+
+A modern replacement for ps.
+
+```
+cargo install procs
+```
+
 ### dust
 
 Dust is meant to give you an instant overview of which directories are using disk space without requiring sort or head.
@@ -132,13 +140,22 @@ A fast and flexible CSV reader and writer for Rust, with support for Serde.
 cargo install xsv
 ```
 
+### dum
+
+An npm scripts runner written in Rust.
+
+```
+cargo install dum
+```
+
+
 ## Automation
 
 Supposing that this file is located in the work directory and it is named `cargo.md`:
 
 ```sh
 # Check the difference between what is locally installed and what is described in this file
-diff <(cat cargo.md | rg '###' | awk '{print $2}') <(ls ~/.cargo/bin) | rg '<|>' | sd '>' '+' | sd '<' '-'
+diff <(cat cargo.md | rg '^### ' | awk '{print $2}' | sort) <(ls ~/.cargo/bin) | rg '<|>' | sd '>' '+' | sd '<' '-'
 
 # Install/update all the executable
 for crate in $(rg '^cargo install' cargo.md | sd 'cargo install' ''); do echo -e "\nInstalling/updating create ${crate}..."; cargo install $crate; done
