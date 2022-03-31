@@ -8,7 +8,7 @@ loc: loc: a tool for counting lines of code
 mdbook: mdbook: an utility to create modern online books from Markdown files
 miniserve: miniserve: a small, self-contained cross-platform CLI tool that allows you to serve some file(s) via HTTP
 redis-query: redis-query: dev-tool to search keys in multiple Redis' databases
-ripgrep: rg: is a line-oriented search tool that recursively searches the current directory for a regex pattern
+ripgrep: rg: a line-oriented search tool that recursively searches the current directory for a regex pattern
 sd: sd: an intuitive find & replace CLI
 so_stupid_search: so_stupid_search: searches text in files
 viu: viu: terminal image viewer

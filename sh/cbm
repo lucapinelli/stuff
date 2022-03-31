@@ -22,18 +22,18 @@ function help {
 }
 
 script_path="$(dirname $(realpath $0))"
-#project_path="$(dirname $script_path)"
+project_path="$(dirname $script_path)"
 
 case $1 in
   list)
     (
-      cd "$script_path/resources"
+      cd "$project_path/resources"
       awk -F ': ' '{print $2": "$3}' cargo.register | sort | column -s ':' -t
     )
   ;;
   upgrade)
     (
-      cd "$script_path/resources"
+      cd "$project_path/resources"
       for crate in $(awk -F ': ' '{print $1}' cargo.register | sort); do
         echo -e "\nInstalling/upgradeing create ${crate}..."
         cargo install $crate
@@ -42,13 +42,13 @@ case $1 in
   ;;
   verify)
     (
-      cd "$script_path/resources"
+      cd "$project_path/resources"
       diff <(awk -F ': ' '{print $2}' cargo.register | sort) <(ls ~/.cargo/bin) | rg '<|>' | sd '>' '+' | sd '<' '-'
     )
   ;;
   register)
     (
-      cd "$script_path/resources"
+      cd "$project_path/resources"
       if [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && ! [[ -n "$5" ]]; then
         echo "$2: $3: $4 [REGISTERED]" >> cargo.register
         echo "$2: $3: $4 [REGISTERED]"
