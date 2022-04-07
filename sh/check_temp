@@ -14,24 +14,24 @@ check_sensor_temp() {
       "High Temperature" \
       "Current temperature is ${max}°C"
     paplay /usr/share/sounds/purple/alert.wav
-    echo "$(date) -- (${retries}) Higher temperature: ${max}°C"
-    if (( retries > 1 )); then
-      sleep 11
-      check_sensor_temp $(($retries - 1))
+    echo "$(date --iso-8601=seconds) -- Higher temperature: ${max}°C (retries=${retries})"
+    if (( retries < 5 )); then
+      sleep 9
+      check_sensor_temp $(($retries + 1))
     fi
   else
-    echo "$(date) -- Higher temperature: ${max}°C"
+    echo "$(date --iso-8601=seconds) -- Higher temperature: ${max}°C"
   fi
 }
 
-check_sensor_temp 5
+check_sensor_temp 0
 
 #
 # Edit the crontab using `crontab -e` to add the following job:
 #
-# # Runs every minute (see https://www.tutorialspoint.com/unix_commands/crontab.htm)
-# * * * * * XDG_RUNTIME_DIR=/run/user/$(id -u) /home/luca/projects/my/stuff/sh/check_temp 2> /tmp/check-temp-error.log 1> /tmp/check-temp.log
+# # Runs every minute
+# * * * * * XDG_RUNTIME_DIR=/run/user/$(id -u) /home/luca/projects/my/stuff/sh/check_temp 2> /tmp/check_temp_error.log 1> /tmp/check_temp.log
 # # XDG_RUNTIME_DIR=/run/user/$(id -u) -- this is required only if the script has to run notify-send
-# # 2> /tmp/check-temp-error.log       -- this will write the errors in the file /tmp/check-temp-error.log
-# # 1> /tmp/check-temp.log             -- this will write the output in the file /tmp/check-temp.log
+# # 2> /tmp/check_temp_error.log       -- this will write the errors in the file /tmp/check_temp_error.log
+# # 1> /tmp/check_temp.log             -- this will write the output in the file /tmp/check_temp.log
 #

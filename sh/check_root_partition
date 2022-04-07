@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+check_partitions() {
+  max=70
+
+  echo "Filesystem Use% Available Mounted_on"
+  echo "---------- ---- --------- ----------"
+
+
+  df -h | grep -E '^/dev/s' | while read line; do
+    # <Filesystem> <Size> <Used> <Avail> <Use%> <Mounted on>
+    # echo "line: $line"
+    readarray -d " " -t tokens <<< "$(echo $line)"
+    # echo "tokens: ${tokens[*]}"
+    filesystem="${tokens[0]}"
+    # size="${tokens[1]}"
+    # used="${tokens[2]}"
+    avail="${tokens[3]}"
+    use="${tokens[4]}"
+    use=${use::-1} # removes the last character (%)
+    mounted_on="${tokens[5]}"
+    # echo
+    # echo "Filesystem: $filesystem" # e.g. /dev/sda6
+    # echo "Size: $size"             # e.g. 134G
+    # echo "Used: $used"             # e.g.  92G
+    # echo "Avail: $avail"           # e.g.  35G
+    # echo "Use%: $use"              # e.g. 73
+    # echo "Mounted on: $mounted_on" # e.g. /
+    echo "$filesystem $use $avail $mounted_on"
+
+    if [ "$mounted_on" = "/" ] & (( use > 80 )); then
+      notify-send \
+        --expire-time=30000 \
+        --icon=/usr/share/icons/elementary-xfce/status/symbolic/dialog-warning-symbolic.svg \
+        "The root partition ($filesystem) is almost full!" \
+        "Current usage is ${use}% (available $avail)"
+      paplay /usr/share/sounds/purple/alert.wav
+    fi
+  done
+}
+
+check_partitions | column -s ' ' -t
+echo
+echo $(date)
+
+#
+# Edit the crontab using `crontab -e` to add the following job:
+#
+# # Runs every minute
+# * * * * * XDG_RUNTIME_DIR=/run/user/$(id -u) /home/luca/projects/my/stuff/sh/check_root_partition 2> /tmp/check_root_partition_error.log 1> /tmp/check_root_partition.log
+# # XDG_RUNTIME_DIR=/run/user/$(id -u)      -- this is required only if the script has to run notify-send
+# # 2> /tmp/check_root_partition_error.log  -- this will write the errors in the file /tmp/check_root_partition_error.log
+# # 1> /tmp/check_root_partition.log        -- this will write the output in the file /tmp/check_root_partition.log
+#
