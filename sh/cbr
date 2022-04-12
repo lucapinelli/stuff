@@ -2,14 +2,17 @@
 
 set -e # -e  exit immediately when a command fails
 
+bold=$(tput bold)
+norm=$(tput sgr0)
+
 HELP="
-NAME
+${bold}NAME${norm}
   cbr - cargo binary register
 
-USAGE
+${bold}USAGE${norm}
   cbr <command>
 
-Commands:
+${bold}Commands${norm}
   list                          lists registered binaries
   upgrade                       installs/upgrades all the registered binaries
   verify                        checks the difference between what is installed and what it is registered
@@ -29,7 +32,10 @@ case $1 in
   list)
     (
       cd "$project_path/resources"
-      awk -F ': ' '{print $2": "$3}' cargo.register | sort | column -s ':' -t
+      (
+        echo "${bold}Binary☀Crate☀Description${norm}"
+        awk -F ': ' '{print $2"☀"$1"☀"$3}' cargo.register | sort
+      ) | column -s '☀' -t
     )
   ;;
   upgrade)

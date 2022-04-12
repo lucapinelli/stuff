@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-const util = require('util');
-const child_process = require('child_process');
-const fs = require('fs');
+const util = require('util')
+const childProcess = require('child_process')
+const fs = require('fs')
 
-const exec = util.promisify(child_process.exec);
+const exec = util.promisify(childProcess.exec)
 
 const usage = `
 
@@ -19,49 +19,48 @@ const usage = `
 
 `
 
-async function asyncSeries(values, asyncCallback) {
-  let index = 0;
+async function asyncSeries (values, asyncCallback) {
+  const index = 0
   await values.reduce(async (promise, value) => {
-    await promise;
-    await asyncCallback(value, index);
-  }, Promise.resolve());
+    await promise
+    await asyncCallback(value, index)
+  }, Promise.resolve())
 }
 
 const main = async () => {
+  if (
+    process.argv.length !== 3 ||
+      process.argv[2] === '--help' ||
+      process.argv[2] === '-help' ||
+      process.argv[2] === '-h'
+  ) {
+    console.log(usage)
+    return
+  }
 
-    if (
-      process.argv.length !== 3
-      || process.argv[2] === '--help'
-      || process.argv[2] === '-help'
-      || process.argv[2] === '-h'
-    ) {
-        console.log(usage);
-        return;
-    }
-
-    const files = fs.readdirSync('.');
-    asyncSeries(files, async (file) => {
-        const stat = fs.statSync(file);
-        const cmd = process.argv[2];
-        if (stat.isFile()) {
-            let command = cmd.includes('{}')
-              ? cmd.replace(/{}/g, file)
-              : `${cmd} "${file}"`;
-            try {
-                console.log('EXECUTE: ', command);
-                const out = await exec(command);
-                if (out.stdout) {
-                    console.log(out.stdout);
-                }
-                if (out.stderr) {
-                    console.log(out.stderr);
-                }
-            } catch (e) {
-                console.log('ERROR');
-                console.log(e);
-            }
+  const files = fs.readdirSync('.')
+  asyncSeries(files, async (file) => {
+    const stat = fs.statSync(file)
+    const cmd = process.argv[2]
+    if (stat.isFile()) {
+      const command = cmd.includes('{}')
+        ? cmd.replace(/{}/g, file)
+        : `${cmd} "${file}"`
+      try {
+        console.log('EXECUTE: ', command)
+        const out = await exec(command)
+        if (out.stdout) {
+          console.log(out.stdout)
         }
-    });
+        if (out.stderr) {
+          console.log(out.stderr)
+        }
+      } catch (e) {
+        console.log('ERROR')
+        console.log(e)
+      }
+    }
+  })
 }
 
-main().catch(e => console.log('An error occured:', e));
+main().catch(e => console.log('An error occured:', e))

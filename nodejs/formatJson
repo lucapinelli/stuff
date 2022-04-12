@@ -1,30 +1,30 @@
 #!/usr/bin/env node
 
-const help=`
+const help = `
 USAGE: formatJson [JSON]
 
 Examples:
 1. formatJson '{"ok": false}'
 2. echo '{"ok": false}' | formatJson
 `
-const fs = require('fs');
+const fs = require('fs')
 
-let text = '';
+let text = ''
 if (process.argv && process.argv[2]) {
-    text = process.argv[2];
-    if (text === '--help') {
-        console.log(help);
-        process.exit();
-    }
+  text = process.argv[2]
+  if (text === '--help') {
+    console.log(help)
+    process.exit()
+  }
 } else {
-    const stdinBuffer = fs.readFileSync(0); // STDIN_FILENO = 0
-    text = stdinBuffer.toString();
+  const stdinBuffer = fs.readFileSync(0) // STDIN_FILENO = 0
+  text = stdinBuffer.toString()
 }
 
-console.log('');
+console.log('')
 try {
-    console.log(JSON.stringify(JSON.parse(text), null, 2));
+  console.log(JSON.stringify(JSON.parse(text), null, 2))
 } catch (e) {
-    console.log('The received data is not a valid JSON:\n\n', e);
+  console.log('The received data is not a valid JSON:\n\n', e)
 }
-console.log('');
+console.log('')
