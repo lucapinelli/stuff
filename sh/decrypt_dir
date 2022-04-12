@@ -21,8 +21,11 @@ if [[ -z "${SECRET}" ]]; then
   exit
 fi
 
-key="$SECRET"
-# TODO find a way to increase the key size
-
-echo -e '\033[00;34m + xor --decrypt -k "$key" -r .\033[00m'
-xor --decrypt -k "$key" -r .
+if key="$(increaseKeyLenght "$SECRET" 128000)"; then
+  # increaseKeyLenght completed successfully
+  echo -e '\033[00;34m + xor --decrypt -k "$key" -r .\033[00m'
+  xor --decrypt -k "$key" -r .
+else
+  # print the error
+  echo "$key"
+fi

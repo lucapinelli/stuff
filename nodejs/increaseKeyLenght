@@ -1,0 +1,107 @@
+#!/usr/bin/env node
+
+const help = `
+USAGE: increaseKeyLenght [key]
+
+Example:
+  increaseKeyLenght 'machebelcastello' 100
+`
+
+let key = process.argv[2]
+let length = process.argv[3]
+if (!key || !length) {
+  console.log(help)
+  process.exit(key !== '--help' ? 1 : 0)
+}
+
+length = Number.parseInt(length)
+if (Number.isNaN(length)) {
+  console.log('ERROR: length must be an integer!\n')
+  console.log(help)
+  process.exit(2)
+}
+
+if (key.length < 7) {
+  console.log('ERROR: the key must have at least 7 characters.')
+  process.exit(3)
+}
+const charCounter = key.split('').reduce((map, char) => {
+  map[char] = 1
+  return map
+}, {})
+if (Object.keys(charCounter).length < 6) {
+  console.log('ERROR the key must contains at least 6 different characters.')
+  process.exit(4)
+}
+
+if (key.length >= length) {
+  console.log(key)
+  process.exit(0)
+}
+
+let alphabet = 'thequickbrownfoxjumpsoverthelazydog'
+alphabet += '1029384756'
+alphabet += 'thequickbrownfoxjumpsoverthelazydog'.split('').reverse().join('').toUpperCase()
+alphabet = alphabet.split('')
+
+// const sum = key.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0)
+key = key.split('')
+const longerKey = [key[0]]
+let loop = 1
+let index = 1
+
+while (longerKey.length < length) {
+  const counters = Object.values(charCounter)
+  const min = Math.min(...counters)
+  const max = Math.max(...counters)
+  let char
+  if (min < (max / 11)) {
+    const shorter = key.filter(char => charCounter[char] < max / 3)
+    index = (index + loop + shorter[index % shorter.length].charCodeAt(0)) % shorter.length
+    char = shorter[index]
+    if (char === longerKey.at(-1) && char === longerKey.at(-2) && char === longerKey.at(-3)) {
+      const alpha = alphabet.filter(c => c !== char)
+      index = ((index + loop) + alpha[loop % alphabet.length].charCodeAt(0)) % alpha.length
+      char = alpha[index]
+    } else {
+      if (char === longerKey.at(-1) && char === longerKey.at(-2)) {
+        char = shorter[loop % shorter.length]
+      }
+    }
+  } else if (loop % 23 === 0 && loop % 29 !== 0 && min < (max / 3)) {
+    index = ((index * loop) + alphabet[loop % alphabet.length].charCodeAt(0)) % alphabet.length
+    char = alphabet[index]
+  } else {
+    index = (index + key[index % key.length].charCodeAt(0)) % key.length
+    char = key[index]
+  }
+
+  if (
+    char === longerKey.at(-1) &&
+    char === longerKey.at(-2) &&
+    char === longerKey.at(-3) &&
+    char === longerKey.at(-4) &&
+    char === longerKey.at(-5)
+  ) {
+    const alpha = alphabet.filter(c => c !== char)
+    index = (index + loop) % alpha.length
+    char = alpha[index]
+  }
+
+  if (
+    char + longerKey.at(-1) === longerKey.at(-2) + longerKey.at(-3) &&
+    longerKey.at(-3) + longerKey.at(-4) === longerKey.at(-5) + longerKey.at(-6)
+  ) {
+    const alpha = alphabet.filter(c => c !== char && c !== longerKey.at(-1))
+    index = (index + loop) % alpha.length
+    char = alpha[index]
+  }
+
+  if (charCounter[char] !== undefined) {
+    ++charCounter[char]
+  }
+  longerKey.push(char)
+  ++loop
+}
+
+console.log(longerKey.join(''))
