@@ -21,6 +21,14 @@ if [[ -z "${SECRET}" ]]; then
   exit
 fi
 
+decrypted="$(fd | xargs file -b | rg -v '^data$|^directory$' | wc -l)"
+if ((decrypted > 0)); then
+  echo -e "\033[00;34m The folder contains $decrypted file(s) that are not of type data."
+  echo -e '\033[00;34m Skipping decryption\033[00m'
+  echo -e '\033[00;34m Terminated\033[00m'
+  exit
+fi
+
 if key="$(increaseKeyLenght "$SECRET" 128000)"; then
   # increaseKeyLenght completed successfully
   echo -e '\033[00;34m + xor --decrypt -k "$key" -r .\033[00m'

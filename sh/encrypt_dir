@@ -23,6 +23,29 @@ if [[ -z "${SECRET}" ]]; then
   exit
 fi
 
+count="$(fd -t f | wc -l)"
+echo -en "\033[00;34m Do you want to encrypt $count file(s) [y/n] (default n)? \033[00m"
+read -n 1 continue
+echo
+if [ "$continue" != "y" ]; then
+  echo -e '\033[00;34m Skipping encryption\033[00m'
+  echo -e '\033[00;34m Terminated\033[00m'
+  exit
+fi
+
+encrypted="$(fd | xargs file -b | rg '^data$' | wc -l)"
+if ((encrypted > 0)); then
+  echo -e "\033[00;34m The folder contains $encrypted data file(s)."
+  echo -en '\033[00;34m Do you want to encrypt the folder [y/n] (default n)? \033[00m'
+  read -n 1 continue
+  echo
+  if [ "$continue" != "y" ]; then
+    echo -e '\033[00;34m Skipping encryption\033[00m'
+    echo -e '\033[00;34m Terminated\033[00m'
+    exit
+  fi
+fi
+
 if key="$(increaseKeyLenght "$SECRET" 128000)"; then
   # increaseKeyLenght completed successfully
   echo -e '\033[00;34m + xor --force -k "$key" -r .\033[00m'
