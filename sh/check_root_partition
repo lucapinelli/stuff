@@ -19,6 +19,7 @@ check_partitions() {
     use="${tokens[4]}"
     use=${use::-1} # removes the last character (%)
     mounted_on="${tokens[5]}"
+    mounted_on=${mounted_on::-1} # removes the last character (%)
     # echo
     # echo "Filesystem: $filesystem" # e.g. /dev/sda6
     # echo "Size: $size"             # e.g. 134G
@@ -28,7 +29,7 @@ check_partitions() {
     # echo "Mounted on: $mounted_on" # e.g. /
     echo "$filesystem $use $avail $mounted_on"
 
-    if [ "$mounted_on" = "/" ] & (( use > 80 )); then
+    if [ "$mounted_on" == "/" ] && (( use > 85 )); then
       notify-send \
         --expire-time=30000 \
         --icon=/usr/share/icons/elementary-xfce/status/symbolic/dialog-warning-symbolic.svg \

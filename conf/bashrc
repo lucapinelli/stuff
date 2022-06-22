@@ -9,6 +9,8 @@
 # <luca was here> #
 ###################
 
+HISTCONTROL=ignoreboth:erasedups
+
 ### Completion and Colorize
 
 if [ "$(whoami)" != "root" ]; then
@@ -35,6 +37,17 @@ xterm*|rxvt*)
 *)
     ;;
 esac
+
+function okko {
+  ok=$?
+  if  [ "$ok" = "0" ]; then
+    art ok green
+  else
+    echo -e "\033[01;31m"
+    figlet '   K O   : ('
+    echo -e "\033[00m"
+  fi
+}
 
 # sets the terminal title
 function title {
@@ -87,6 +100,14 @@ function show_alias {
   echo -en "\033[00;34m⚙ " # set color blue and print '+' without new line
   alias $1 | sd '^[^=]*=' '' | sd '^[^;]*; *' ''  | sd '.$' ''
   echo -e '\033[00m' # reset the color
+}
+
+function clip_date {
+  echo -n "$(node -e 'console.log(new Date())')" | xclip -selection c
+}
+
+function clip_uuid {
+  echo -n "$(uuid)" | xclip -selection c
 }
 
 ### Alias

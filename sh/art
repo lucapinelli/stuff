@@ -7,24 +7,51 @@ HELP="
 
 USAGE:
 
-    art [title]
+    art [title] [color]
 
 Available titles are:
 $(for title in "${titles[@]}"; do echo "* $title"; done)
+* random
 
 If no title is specified a random one will be selected.
 
+Available colors are:
+* black
+* red
+* green
+* yellow
+* blue
+* purple
+* cyan
+* white
+* rainbow
+* rainbow2
+* rainbow3
+* rainbow4
+* rainbow5
+
+If no color is specified a random one will be selected.
+
 "
 
+black="\033[00;30m"
+red="\033[00;31m"
+green="\033[00;32m"
+yellow="\033[00;33m"
+blue="\033[00;34m"
+purple="\033[00;35m"
+cyan="\033[00;36m"
+white="\033[00;37m"
+
 colors=(
-  # "\033[00;30m" # black
-  "\033[00;31m" # red
-  "\033[00;32m" # green
-  "\033[00;33m" # yellow
-  "\033[00;34m" # blue
-  "\033[00;35m" # purple
-  "\033[00;36m" # cyan
-  "\033[00;37m" # white
+  # $black
+  $red
+  $green
+  $yellow
+  $blue
+  $purple
+  $cyan
+  $white
 )
 reset="\033[00m"
 
@@ -34,22 +61,92 @@ reset="\033[00m"
 # done
 
 case "$1" in
-  "")
-    echo -e "${colors[$((RANDOM % 7))]}"
-    cat $(dirname "${BASH_SOURCE[0]}")/../ascii_art/${titles[$((RANDOM % size))]}.txt
-    echo -e "${reset}"
+  ""|"random")
+    path="$(dirname "${BASH_SOURCE[0]}")/../ascii_art/${titles[$((RANDOM % size))]}.txt"
   ;;
   *)
     path="$(dirname "${BASH_SOURCE[0]}")/../ascii_art/$1.txt"
-    if [ -f "$path" ]; then
-      echo -e "${colors[$((RANDOM % 7))]}"
-      cat "$path"
-      echo -e "${reset}"
-    else
+    if ! [ -f "$path" ]; then
       echo -e "$HELP"
+      exit 1
     fi
   ;;
 esac
+
+case "$2" in
+  "")
+    color="${colors[$((RANDOM % 7))]}"
+  ;;
+  "black"|"red"|"green"|"yellow"|"blue"|"purple"|"cyan"|"white")
+    color="${!2}"
+  ;;
+  "rainbow")
+    echo
+    count=0
+    while IFS= read line; do # IFS= will preseve the spaces otherwise the line is trimmed
+      echo -en "${colors[($count % 7)]}"
+      echo "$line"
+      count=$(($count + 1))
+    done < "$path"
+    echo -e "${reset}"
+    exit 0
+  ;;
+  "rainbow2")
+    # random color for each line
+    echo
+    while IFS= read line; do # IFS= will preseve the spaces otherwise the line is trimmed
+      echo -en "${colors[$((RANDOM % 7))]}"
+      echo "$line"
+    done < "$path"
+    echo -e "${reset}"
+    exit 0
+  ;;
+  "rainbow3")
+    # rainbow on each char
+    echo
+    count=0
+    while IFS= read  -r -d '' -n 1 char; do # IFS= will preseve the spaces otherwise the line is trimmed
+      echo -en "${colors[($count % 7)]}"
+      echo -n "$char"
+      count=$(($count + 1))
+    done < "$path"
+    echo -e "${reset}"
+    exit 0
+  ;;
+  "rainbow4")
+    # rainbow on each char keeping the same color for the same position
+    echo
+    while IFS= read line; do # IFS= will preseve the spaces otherwise the line is trimmed
+      count=0
+      while IFS= read  -r -d '' -n 1 char; do # IFS= will preseve the spaces otherwise the line is trimmed
+        echo -en "${colors[($count % 7)]}"
+        echo -n "$char"
+        count=$(($count + 1))
+      done < <(printf %s "$line")
+      echo
+    done < "$path"
+    echo -e "${reset}"
+    exit 0
+  ;;
+  "rainbow5")
+    # rainbow on each char random
+    echo
+    while IFS= read  -r -d '' -n 1 char; do # IFS= will preseve the spaces otherwise the line is trimmed
+      echo -en "${colors[$((RANDOM % 7))]}"
+      echo -n "$char"
+    done < "$path"
+    echo -e "${reset}"
+    exit 0
+  ;;
+  *)
+    echo -e "$HELP"
+    exit 1
+  ;;
+esac
+
+echo -e "${color}"
+cat "$path"
+echo -e "${reset}"
 
 # to automatically create colored ASCII art use:
 # script -c 'asciiart -w 64 -c parasite05_4.png' parasite.txt
