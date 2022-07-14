@@ -31,7 +31,7 @@ project_path="$(dirname $script_path)"
 case $1 in
   list)
     (
-      cd "$project_path/resources"
+      cd "$project_path/resources/cbr"
       (
         echo "${bold}Binary☀Crate☀Description${norm}"
         awk -F ': ' '{print $2"☀"$1"☀"$3}' cargo.register | sort
@@ -40,7 +40,7 @@ case $1 in
   ;;
   upgrade)
     (
-      cd "$project_path/resources"
+      cd "$project_path/resources/cbr"
       for crate in $(awk -F ': ' '{print $1}' cargo.register | sort); do
         echo -e "\nInstalling/upgradeing create ${crate}..."
         cargo install $crate
@@ -49,13 +49,13 @@ case $1 in
   ;;
   verify)
     (
-      cd "$project_path/resources"
+      cd "$project_path/resources/cbr"
       diff <(awk -F ': ' '{print $2}' cargo.register | sort) <(ls ~/.cargo/bin) | rg '<|>' | sd '>' '+' | sd '<' '-'
     )
   ;;
   register)
     (
-      cd "$project_path/resources"
+      cd "$project_path/resources/cbr"
       if [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && ! [[ -n "$5" ]]; then
         line="$(rg --no-filename "^$2:" cargo.register | cat)"
         if [ "$line" != "" ]; then
@@ -83,7 +83,7 @@ case $1 in
   ;;
   unregister)
     (
-      cd "$project_path/resources"
+      cd "$project_path/resources/cbr"
       if [ -n "$2" ] && ! [[ -n "$3" ]]; then
         line="$(rg --no-filename "^$2:" cargo.register | cat)"
         if [ "$line" != "" ]; then

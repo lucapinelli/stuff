@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+HELP="
+NAME
+  clickme - click the left button of the mouse multiple times
+
+USAGE
+  clickme [MILLIS DELAY] [COUNT]
+
+EXAMPLES
+  clickme 1000 10 # will click the mouse 10 times every one second
+
+REQUIRES
+  xdotool (sudo apt install xdotool)
+"
+
+if (( $# != 2 )); then
+  echo "$HELP"
+  exit
+fi
+
+
+DELAY=$1
+REPEAT=$2
+BUTTON=1
+xdotool click --delay $DELAY --repeat $REPEAT $BUTTON

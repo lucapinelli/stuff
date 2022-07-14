@@ -42,10 +42,10 @@ function okko {
   ok=$?
   if  [ "$ok" = "0" ]; then
     art ok green
+    sound powerup_success
   else
-    echo -e "\033[01;31m"
-    figlet '   K O   : ('
-    echo -e "\033[00m"
+    art ko red
+    sound error_6
   fi
 }
 
@@ -143,6 +143,7 @@ alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -frame
 alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'
 alias ffdisplay2small='show_alias ffdisplay2small; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 1920x1080'
 alias ffwebcam='show_alias ffwebcam; ffplay -window_title "Webcam" -framerate 8 -f video4linux2 -i /dev/video0 -video_size 240x240'
+alias render_html='lynx --stdin -dump -width 160'
 
 alias chrome_unsafe='
 google-chrome \

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-titles=(beep koi lapins ok peace smile zen)
+titles=(beep koi lapins ok ko peace smile zen)
 size=${#titles[@]}
 
 HELP="
@@ -25,10 +25,6 @@ Available colors are:
 * cyan
 * white
 * rainbow
-* rainbow2
-* rainbow3
-* rainbow4
-* rainbow5
 
 If no color is specified a random one will be selected.
 
@@ -54,11 +50,6 @@ colors=(
   $white
 )
 reset="\033[00m"
-
-# for color in "${colors[@]}"
-# do
-#   echo -e "${color} test color ${reset}"
-# done
 
 case "$1" in
   ""|"random")

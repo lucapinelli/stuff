@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e # -e  exit immediately when a command fails
+
+bold=$(tput bold)
+norm=$(tput sgr0)
+
+HELP="
+${bold}NAME${norm}
+  sound - emits a sound
+
+${bold}USAGE${norm}
+  sound <sound-name>
+
+${bold}Available sounds:${norm}
+  error_6
+  powerup_success
+  tada_fanfare_g
+"
+
+script_path="$(dirname $(realpath $0))"
+project_path="$(dirname $script_path)"
+
+case $1 in
+  error_6|powerup_success|tada_fanfare_g)
+    paplay --volume=32000 "$project_path/resources/sound/$1.ogg"
+  ;;
+  *)
+    echo "$HELP"
+  ;;
+esac
