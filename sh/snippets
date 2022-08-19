@@ -81,7 +81,7 @@ case "$1" in
   ;;
   "show" | "s")
     #fd ${@:2:$#-2} "${@: -1}" ~/snippets -exec more
-    fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header
+    fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header --paging never
   ;;
   "clip" | "c")
     xclip -sel c -i "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
