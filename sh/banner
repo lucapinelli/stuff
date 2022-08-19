@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e # e  exit if a commands returns a non-zero value
+
+echo -e "\033[01;35m\n\n\n"
+toilet --width "$(($(tput cols) - 18))" --font future --filter border "  $@  " | sed 's/^/        /'
+echo -e "\033[00m\n\n"

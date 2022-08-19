@@ -128,6 +128,7 @@ alias git_untracked='git status --short --untracked-files | cut --delimiter=" " 
 
 alias clip='show_alias clip; xclip -selection c -i' # copy the content of the file in the clipboard
 alias clip_save='show_alias clip_save; xclip -selection c -o >' # copy the content of the clipboard in a file
+alias bottom='show_alias bottom; xfce4-terminal --title=bottom --geometry=128x48+100+100 --command "btm --mem_as_value -g" &'
 alias jsonkv="jq -r '
 paths(scalars) as \$p
   | [ ([\$p[] | tostring] | join(\".\")), (getpath(\$p) | tojson) ]

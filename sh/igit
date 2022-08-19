@@ -66,20 +66,20 @@ status() {
   git status -sb
   label "git stash list"
   git stash list
-  label "git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*'"
-  git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*'
+  label "git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*'"
+  git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*'
 }
 
 pull() {
   label "git pull"
   git pull
   status
-  olds=$(git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*' | wc -l)
+  olds=$(git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*' | wc -l)
   if (( $olds > 0 )); then
     read -p "Do you want to remove the merged branches? (yes/no) " yn
     if [ "$yn" = "yes" ]; then
-      label "git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*' | xargs git branch -d"
-      git branch --merged | grep -vE ' development$| qa$| master$| release$|^\*' | xargs git branch -d
+      label "git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*' | xargs git branch -d"
+      git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*' | xargs git branch -d
     fi
   fi
 }
