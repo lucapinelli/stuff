@@ -64,6 +64,8 @@ label() {
 status() {
   label "git status -sb"
   git status -sb
+  label "git cherry -v # lists local commits that require a push"
+  git cherry -v
   label "git stash list"
   git stash list
   label "git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*'"
