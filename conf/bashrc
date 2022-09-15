@@ -87,13 +87,34 @@ function wait_get {
   do
     count=$((count + 1))
     if (( count > 60 )); then
-        error "startup failed: check_url \"$1\" timed out"
+        echo "failed: '$1'"
+        exit $http_status
     fi
     sleep 3
     echo -n "."
     http_status=$(curl -o /dev/null -s -w "%{http_code}\n" $1 || echo "ignore error" > /dev/null)
   done
   echo " $2"
+}
+
+function wait_for {
+  echo -n "WAIT FOR $1 ..."
+  count=0
+  eval "$1" &> /dev/null
+  status=$?
+  while [ "$status" != "0" ]
+  do
+    count=$((count + 1))
+    if (( count > 60 )); then
+        echo " failed: exit status is ${status}"
+        exit $status
+    fi
+    sleep 3
+    echo -n "."
+    eval "$1" &> /dev/null
+    status=$?
+  done
+  echo " completed sucessfully"
 }
 
 function show_alias {
@@ -114,7 +135,7 @@ function clip_uuid {
 
 alias l='ls --group-directories-first'
 alias ll='show_alias ll; ls -oh --group-directories-first'
-alias hat='show_alias hat; bat --style=header'
+alias hat='show_alias hat; bat --style=header --paging never'
 alias ..='cd ..'
 alias ...='..; ..'
 alias ....='..; ..; ..'
@@ -125,7 +146,7 @@ alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | 
 # use apt_history -B 1 to print the dates
 alias dpkg_history="show_alias dpkg_history; zcat /var/log/dpkg.log.*.gz | cat - /var/log/dpkg.log | grep -E 'install |upgrade |remove ' "
 alias git_untracked='git status --short --untracked-files | cut --delimiter=" " --fields=2'
-
+alias watch_modify="inotifywait -qq --event modify --recursive --exclude 'node_modules'" # e.g. while watch_modify .; do dum test; done
 alias clip='show_alias clip; xclip -selection c -i' # copy the content of the file in the clipboard
 alias clip_save='show_alias clip_save; xclip -selection c -o >' # copy the content of the clipboard in a file
 alias bottom='show_alias bottom; xfce4-terminal --title=bottom --geometry=128x48+100+100 --command "btm --mem_as_value -g" &'

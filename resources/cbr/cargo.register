@@ -17,3 +17,4 @@ xsv: xsv: a fast and flexible CSV reader and writer
 dum: dum: a faster npm scripts runner
 broot: broot: get an overview of a directory, even a big one
 nu: nu: The nushell language and shell
+riffdiff: riff: A diff highlighter
