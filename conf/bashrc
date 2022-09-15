@@ -3,7 +3,7 @@
 # for examples
 
 # ...
-# meld ~/.bashrc conf/bashrc
+# meld conf/bashrc ~/.bashrc
 
 ###################
 # <luca was here> #
@@ -145,6 +145,7 @@ alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Nam
 alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | rg ' install'"
 # use apt_history -B 1 to print the dates
 alias dpkg_history="show_alias dpkg_history; zcat /var/log/dpkg.log.*.gz | cat - /var/log/dpkg.log | grep -E 'install |upgrade |remove ' "
+alias colog='sd "(DEBUG)" "\033[34m\$1\033[0m" | sd "(INFO)" "\033[32m\$1\033[0m" | sd "(WARN)" "\033[33m\$1\033[0m" | sd "(ERROR)" "\033[31m\$1\033[0m"'
 alias git_untracked='git status --short --untracked-files | cut --delimiter=" " --fields=2'
 alias watch_modify="inotifywait -qq --event modify --recursive --exclude 'node_modules'" # e.g. while watch_modify .; do dum test; done
 alias clip='show_alias clip; xclip -selection c -i' # copy the content of the file in the clipboard
