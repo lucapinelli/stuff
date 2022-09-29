@@ -8,10 +8,10 @@ USAGE:
 
 ACTIONS:
 
-  l, list
-    lists all the snippets with a name that matches the pattern
+  fd, find
+    searches and lists all the snippets with a name that matches the pattern
 
-  g, grep
+  rg, grep
     uses rg to grep the text inside all the snippets
 
   s, show
@@ -38,7 +38,7 @@ ACTIONS:
 EXAMPLES:
 
   # Lists all the file and folders
-  snippets list ".*"
+  snippets find ".*"
 
   # Greps the word "bash" in all the files
   snippets grep "env bash"
@@ -73,10 +73,10 @@ if [ -z $SNIPPETS_HOME ]; then
 fi
 
 case "$1" in
-  "list" | "l")
+  "find" | "fd")
     fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME"
   ;;
-  "grep" | "g")
+  "grep" | "rg")
     rg ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME"
   ;;
   "show" | "s")
