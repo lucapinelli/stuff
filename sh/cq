@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -e # -e  exit immediately when a command fails
+
+bold=$(tput bold)
+norm=$(tput sgr0)
+
+HELP="
+${bold}NAME${norm}
+  cq - CopyQ utility
+
+${bold}USAGE${norm}
+  cq command
+
+${bold}Commands${norm}
+  h, history         lists the clipboard history
+  s, select          select an item of the history
+  help               shows this help
+
+${bold}Examples${norm}
+
+# show the last 20 items in the history
+cq h
+
+# show the items in the history that match 'jabba' (case insensitive)
+cq h jabba
+
+# select the item at index 10
+cq s 10
+"
+
+function help {
+  echo "$HELP"
+}
+
+case $1 in
+  h|history)
+    max=20
+    [ -n "$2" ] && max=200
+    for (( i = $max; i >= 0; i-- )); do
+      if [ -n "$2" ]; then
+        clip=$(copyq read $i | tr '[:upper:]' '[:lower:]')
+        search=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+        if [[ ! "$clip" =~ .*"$search".* ]]; then
+          continue
+        fi
+      fi
+      echo -e "\n\033[00;34m___ $i ___________________________\033[00m"
+      copyq read $i
+    done
+    echo -e "\n\033[00;34m_________________________________\033[00m\n"
+  ;;
+  s|select)
+    if [ -z "$2" ]; then
+      echo -e "${bold}ERROR:${norm} you need to specify an index.\n"
+      help
+      exit 1
+    fi
+    echo -e "\033[00;34m___ selected $2 ___________________________\033[00m"
+    copyq read $2
+    echo
+    echo -e "\033[00;34m_________________________________\033[00m\n"
+    copyq select $2
+  ;;
+  help)
+    help
+  ;;
+  *)
+    echo -e "${bold}ERROR:${norm} invalid command $1.\n"
+    help
+  ;;
+esac

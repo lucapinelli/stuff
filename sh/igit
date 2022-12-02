@@ -27,8 +27,8 @@ ACTIONS:
   diff [git diff options]
     shows the diffs using Meld
 
-  mr <new branch name>
-    commits and pushes the staged changes to a new branch named as specified
+  mr <new commit/branch name>
+    commits and pushes the staged changes to a new branch
 
   stash-unstaged <stash name>
     stashes the unstaged changes
@@ -105,13 +105,14 @@ mr() {
   # if $1 is empty print the help and exit
   if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
 
-  branchName="$1"
-  label "git checkout -b $branchName" && \
-  git checkout -b $branchName && \
-  label "git commit -m $branchName" && \
-  git commit -m $branchName && \
-  label "git push --set-upstream origin $branchName" && \
-  git push --set-upstream origin $branchName;
+  commit="$1"
+  branch="$(echo $1 | sd ' ' '-')"
+  label "git checkout -b $branch" && \
+  git checkout -b $branch && \
+  label "git commit -m $commit" && \
+  git commit -m "$commit" && \
+  label "git push --set-upstream origin $branch" && \
+  git push --set-upstream origin $branch;
 }
 
 stash_unstaged() {
