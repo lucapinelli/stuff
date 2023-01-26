@@ -40,9 +40,15 @@ case $1 in
   ;;
   upgrade)
     (
+      echo -e "\nUpgrading Rust..."
+      echo "$ rustc --version"
+      rustc --version
+      echo "$ rustup update"
+      rustup update
       cd "$project_path/resources/cbr"
       for crate in $(awk -F ': ' '{print $1}' cargo.register | sort); do
-        echo -e "\nInstalling/upgradeing create ${crate}..."
+        echo -e "\nInstalling/upgrading create ${crate}..."
+        echo "$ cargo install $crate"
         cargo install $crate
       done
     )

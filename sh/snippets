@@ -22,15 +22,15 @@ ACTIONS:
     pattern
 
   e, edit
-    opens the vi editor to edit the first snippet with a name that matches the
-    pattern
+    opens the first snippet with a name that matches the pattern in the
+    Helix editor
 
-  a, atom
-    opens the Atom editor to edit all the snippets with a name that matches the
-    pattern
+  a, all
+    opens all the snippets with a name that matches the pattern in the
+    Codium editor
 
   o, open
-    opens the root folder of the snippets using the Atom editor
+    opens the root folder of the snippets using the Codium editor
 
   h, help
     shows this help
@@ -38,10 +38,10 @@ ACTIONS:
 EXAMPLES:
 
   # Lists all the file and folders
-  snippets find ".*"
+  snippets fd ".*"
 
   # Greps the word "bash" in all the files
-  snippets grep "env bash"
+  snippets rg "env bash"
 
   # Show all the snippets that contains "move to"
   snippets show "move to"
@@ -50,8 +50,8 @@ EXAMPLES:
   # that contains "message"
   snippets edit -e json "message"
 
-  # Edit (using Atom) all the snippets type json (the extension is .json)
-  snippets atom -e json ".*"
+  # Edit (using Codium) all the snippets type json (the extension is .json)
+  snippets all -e json ".*"
 
   # opens the root folder of the snippets using the Atom editor
   snippets open
@@ -60,8 +60,10 @@ DEPENDENCIES:
 
   fd - https://github.com/sharkdp/fd
   rg - https://github.com/BurntSushi/ripgrep
-  vi - https://www.vim.org/
-  atom - https://atom.io/
+  hx - https://github.com/helix-editor/helix
+  codium - https://github.com/VSCodium/vscodium
+  xclip - sudo apt install xclip
+  bat - https://github.com/rivy/rust.bat
 
   The root folder that contains all the snippets must be located at ~/snippets.
   To change the root folder path set the environment variable SNIPPETS_HOME.
@@ -88,13 +90,13 @@ case "$1" in
     bat "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "edit" | "e")
-    vi "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    hx "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
-  "atom" | "a")
-    atom "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+  "all" | "a")
+    codium "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "open" | "o")
-    atom "$SNIPPETS_HOME"
+    codium "$SNIPPETS_HOME"
   ;;
   *)
     echo -e "$HELP"
