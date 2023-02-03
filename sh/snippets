@@ -27,10 +27,10 @@ ACTIONS:
 
   a, all
     opens all the snippets with a name that matches the pattern in the
-    Codium editor
+    Lapce editor
 
   o, open
-    opens the root folder of the snippets using the Codium editor
+    opens the root folder of the snippets using the Lapce editor
 
   h, help
     shows this help
@@ -50,7 +50,7 @@ EXAMPLES:
   # that contains "message"
   snippets edit -e json "message"
 
-  # Edit (using Codium) all the snippets type json (the extension is .json)
+  # Edit (using lapce) all the snippets type json (the extension is .json)
   snippets all -e json ".*"
 
   # opens the root folder of the snippets using the Atom editor
@@ -61,7 +61,7 @@ DEPENDENCIES:
   fd - https://github.com/sharkdp/fd
   rg - https://github.com/BurntSushi/ripgrep
   hx - https://github.com/helix-editor/helix
-  codium - https://github.com/VSCodium/vscodium
+  lapce - https://github.com/lapce/lapce
   xclip - sudo apt install xclip
   bat - https://github.com/rivy/rust.bat
 
@@ -93,10 +93,10 @@ case "$1" in
     hx "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "all" | "a")
-    codium "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    lapce "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "open" | "o")
-    codium "$SNIPPETS_HOME"
+    lapce "$SNIPPETS_HOME"
   ;;
   *)
     echo -e "$HELP"

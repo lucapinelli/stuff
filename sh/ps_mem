@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-ps -A --sort -rss -o comm,pmem,rss | awk '
+help='
+NAME
+  ps_mem - reports a snapshot of the current processes memory usage.
+
+USAGE
+  ps_mem [number of processes to include in the report]
+
+EXAMPLES
+  ps_mem 15
+'
+
+function psmem {
+  ps -A --sort -rss -o comm,pmem,rss | awk '
   NR == 1 { print; next }
   { a[$1] += $2; b[$1] += $3; }
   END {
@@ -19,9 +31,19 @@ ps -A --sort -rss -o comm,pmem,rss | awk '
       printf "%-20s\t%-6s\t%.2f%s\t%s\n", i, a[i], human_readable, unit[j+2], b[i]
     }
   }
-' | awk 'NR>1' | sort -rnk4 | awk '
-  BEGIN {printf "%-20s\t%%MEM\tSIZE\n", "COMMAND"}
-  {
-    printf "%-20s\t%-6s\t%s\n", $1, $2, $3
-  }
-' | bat --style=plain #| less
+  ' | awk 'NR>1' | sort -rnk4 | awk '
+    BEGIN {printf "%-20s\t%%MEM\tSIZE\n", "COMMAND"}
+    {
+      printf "%-20s\t%-6s\t%s\n", $1, $2, $3
+    }
+  ' 
+}
+
+re='^[0-9]+$'
+if [[ "$1" =~ $re ]] ; then # if arg is number
+  psmem | head -n $(($1 + 1))
+elif [[ -z $1 ]] ; then # if arg is not set
+  psmem | more
+else
+  echo "$help"
+fi

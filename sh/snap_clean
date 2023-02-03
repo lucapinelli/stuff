@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e # exit immediately when a command fails
+set -u # treat unset variables as an error when substituting
+
+echo -e "\nWARNING: CLOSE ALL SNAPS BEFORE RUNNING THIS\n"
+
+echo "$ snap list --all | rg -v 'bare|^core|^gnome[\d-]+ |gtk-common-themes|^qt5|^snap'"
+snap list --all | rg -v 'bare|^core|^gnome[\d-]+ |gtk-common-themes|^qt5|^snap'
+
+echo
+read -p "Did you close all the snap application? (yes/no) " yn
+if [ "$yn" != "yes" ]; then
+    echo "abort :("
+    echo
+    exit 1
+fi
+
+echo "Removing old revisions of snaps..."
+snap list --all | awk '/disabled/{print $1, $3}' |
+  while read snapname revision; do        
+    echo "snap remove $snapname --revision=$revision"
+    snap remove "$snapname" --revision="$revision"
+  done
+
+echo "done :)"
+echo

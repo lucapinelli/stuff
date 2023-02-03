@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e # -e  exit immediately when a command fails
+set -e # exit immediately when a command fails
 
 bold=$(tput bold)
 norm=$(tput sgr0)
