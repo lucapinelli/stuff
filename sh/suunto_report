@@ -86,3 +86,4 @@ from freedive
 group by year, month
 order by -max(max_depth), year, month;
 " | sqlite3 FreeDiveList_2023-02-04.sqlite.db
+echo
