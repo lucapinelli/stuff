@@ -1,0 +1,88 @@
+#!/bin/bash
+
+pdf="$1"
+csv="$(echo "$pdf" | sd '\.pdf$' '.csv')"
+
+pdftotext "$pdf" /tmp/suunto_report.txt
+rg '[\w\d]' /tmp/suunto_report.txt | sd '^[^\w\d]*([\w\d ]+)[^\w\d]*$' '$1' > /tmp/suunto_report_nobl.txt
+printf "id,year,month,day,time,duration,max depth,avg depth\n" > "$csv"
+i=0
+while read line
+do
+  i=$((i + 1))
+  if ((i < 21)); then # exclude the first 20 lines
+    continue;
+  fi
+  module=$(( (i - 20) % 8 ))
+  if ((module == 1)); then
+    id="$line"
+  elif ((module == 2)); then
+    # date="$line"
+    split=(${line//\// })
+    year=${split[2]}
+    month=${split[0]}
+    day=${split[1]}
+  elif ((module == 3)); then
+    time="$line"
+  elif ((module == 4)); then
+    # duration="$line"
+    duration="$(echo $line | sd '^0:(\d\d).(\d\d)$' '($1 * 60) + $2' | bc)"
+  elif ((module == 5)); then
+    max_depth="$(echo "$line" | sd '^([\d.]+)[^\d]*$' '$1')"
+  elif ((module == 6)); then
+    avg_depth="$(echo "$line" | sd '^([\d.]+)[^\d]*$' '$1')"
+    printf "$id,$year,$month,$day,$time,$duration,$max_depth,$avg_depth\n" >> "$csv"
+  fi
+done < /tmp/suunto_report_nobl.txt
+
+banner csv
+head "$csv" | column --separator ',' --table # print in a tabular format (print in a table)
+
+banner sqlite3
+echo '> remove old DB'
+rm -f FreeDiveList_2023-02-04.sqlite.db
+echo '> create table "freedive"'
+sqlite3 FreeDiveList_2023-02-04.sqlite.db '
+create table "freedive" (
+  "id" integer,
+  "year" integer,
+  "month" integer,
+  "day" integer,
+  "time" text,
+  "duration" integer,
+  "max_depth" real,
+  "avg_depth" real
+);
+'
+echo '> import csv'
+echo "
+.mode csv
+.separator ,
+.import ${csv} freedive
+delete from freedive where id = 'id';
+" | sqlite3 FreeDiveList_2023-02-04.sqlite.db
+
+banner reports
+echo "
+╭──────────────╮
+│ Top duration │
+╰──────────────╯
+"
+echo ".mode columns
+select year, month, max(duration), count(*)
+from freedive
+group by year, month
+order by -max(duration), year, month;
+" | sqlite3 FreeDiveList_2023-02-04.sqlite.db
+
+echo "
+╭───────────╮
+│ Top depth │
+╰───────────╯
+"
+echo ".mode columns
+select year, month, max(max_depth), count(*)
+from freedive
+group by year, month
+order by -max(max_depth), year, month;
+" | sqlite3 FreeDiveList_2023-02-04.sqlite.db
