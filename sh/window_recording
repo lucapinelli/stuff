@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+echo "Please select the window that you want to record."
+
+win_info="$(xwininfo)"
+x="$(echo "$win_info" | rg -i 'absolute upper-left x' | sd '^.* (\d+)$' '$1' )"
+y="$(echo "$win_info" | rg -i 'absolute upper-left y' | sd '^.* (\d+)$' '$1' )"
+width="$(echo "$win_info" | rg -i '^\W+width:' | sd '^.* (\d+)$' '$1' )"
+height="$(echo "$win_info" | rg -i '\W+height:' | sd '^.* (\d+)$' '$1' )"
+now="$(date +%Y-%m-%d_%H-%M_%S)"
+
+echo "$win_info"
+echo "--------------"
+echo "
+executing:
+
+> ffmpeg -f x11grab -framerate 25 -video_size ${width}x${height} -i +${x},${y} -s $((width/2))x$((height/2)) "window_recording_${now}.mp4"
+
+[press ctrl+c in this terminal to stop the recording]
+
+"
+
+ffmpeg -f x11grab -framerate 25 -video_size ${width}x${height} -i +${x},${y} -s $((width/2))x$((height/2)) "window_recording_${now}.mp4"
