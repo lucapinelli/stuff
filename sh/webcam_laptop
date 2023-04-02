@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -e # exit immediately when a command fails
+
+help="
+NAME
+  webcam_laptop - setups the webcam on /dev/video0
+
+USAGE
+  webcam_laptop [OPTION]
+
+OPTION
+  bw               Sets the webcam in black and white (saturation 100%)
+  help,--help,-h   Shows this help
+
+USAGE EXAMPLES
+  webcam_laptop
+  webcam_laptop bw
+  webcam_laptop help
+"
+
+configure_webcam () {
+  v4l2-ctl -d /dev/video0 -l
+
+  if [ "$1" = "bw" ]; then
+    set -x # print each command before executing it
+    v4l2-ctl -d /dev/video0 -c saturation=0 # BW
+  else
+    set -x # print each command before executing it
+    v4l2-ctl -d /dev/video0 -c saturation=64 # color
+  fi
+
+  v4l2-ctl -d /dev/video0 -c brightness=32
+  v4l2-ctl -d /dev/video0 -c contrast=32
+  v4l2-ctl -d /dev/video0 -c hue=0
+  v4l2-ctl -d /dev/video0 -c gain=0
+  v4l2-ctl -d /dev/video0 -c sharpness=0
+  v4l2-ctl -d /dev/video0 -c backlight_compensation=0
+}
+
+
+case "$1" in
+  ""|"bw") configure_webcam "$1" ;;
+  *) echo "$help" ;;
+esac

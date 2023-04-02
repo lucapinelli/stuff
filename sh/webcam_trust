@@ -20,6 +20,8 @@ USAGE EXAMPLES
 "
 
 configure_webcam () {
+  v4l2-ctl -d /dev/video4 -l
+
   if [ "$1" = "bw" ]; then
     set -x # print each command before executing it
     v4l2-ctl -d /dev/video4 -c saturation=1 # BW

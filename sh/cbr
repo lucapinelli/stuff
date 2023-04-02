@@ -45,11 +45,17 @@ case $1 in
       rustc --version
       echo "$ rustup update"
       rustup update
+      echo -e "\nInstalling/upgrading binstall..."
+      if [ ! -e "~/.cargo/bin/cargo-binstall" ] ; then
+        cargo binstall cargo-binstall
+      else
+        cargo install cargo-binstall
+      fi
       cd "$project_path/resources/cbr"
       for crate in $(awk -F ': ' '{print $1}' cargo.register | sort); do
         echo -e "\nInstalling/upgrading create ${crate}..."
-        echo "$ cargo install $crate"
-        cargo install $crate
+        echo "$ cargo binstall $crate"
+        cargo binstall $crate
       done
     )
   ;;

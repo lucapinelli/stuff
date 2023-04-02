@@ -1,7 +1,5 @@
-amp: amp: cli text editor
 bat: bat: a cat clone with syntax highlighting and Git integration
 bottom: btm: cli system monitor
-broot: broot: get an overview of a directory, even a big one
 cfonts: cfonts: cool fonts in the console
 difftastic: difft: structural diff tool that understands syntax (of over 30 programming languages)
 du-dust: dust: gives you an instant overview of which directories are using disk space
@@ -11,7 +9,6 @@ gitui: gitui: a git GUI right in your terminal
 loc: loc: a tool for counting lines of code
 mdbook: mdbook: an utility to create modern online books from Markdown files
 miniserve: miniserve: a small, self-contained cross-platform CLI tool that allows you to serve some file(s) via HTTP
-nu: nu: The nushell language and shell
 ouch: ouch: easily compressing and decompressing files and directories
 procs: procs: a modern replacement for ps
 redis-query: redis-query: dev-tool to search keys in multiple Redis' databases
@@ -21,5 +18,9 @@ sd: sd: an intuitive find & replace CLI
 tealdeer: tldr: TL;DR "Too Long; Didn't Read"
 viu: viu: terminal image viewer
 xcp: xcp: an extended cp
-xor: xor: command line application that implements basic XOR encryption
 xsv: xsv: a fast and flexible CSV reader and writer
+rm-improved: rip: Deletion tool. Deleted files get sent to the graveyard
+ruplacer: ruplacer: find and replace text in source files
+watchexec-cli: watchexec: standalone tool that watches a path and runs a command whenever it detects modifications
+kondo: kondo: cleans node_modules, target, build, and friends from your projects
+bartib: bartib: time tracker tool
