@@ -1,17 +1,55 @@
 #!/bin/bash
 
-pdf="$1"
-csv="$(echo "$pdf" | sd '\.pdf$' '.csv')"
+HELP="
+suunto_report 1.0.0
+Luca Pinelli
 
-pdftotext "$pdf" /tmp/suunto_report.txt
+suunto_report builds an show a report of your free dive using the PDF export file
+from Suunto DM5. Additionally you will find in this foldera SQLite 3 database and
+a CSV file contining all the data extracted from the PDF.
+
+USAGE:
+  suunto_report PDF_PATH
+
+ARGS:
+  PDF_PATH the path of the PDF report file exported using Suunto DM5
+"
+
+case "$1" in
+  -h|--help)
+    echo "$HELP"
+    exit 0
+esac
+
+if [ -z "$1" ]; then
+    echo "You need to specify a PDF file"
+    exit 1
+fi
+
+if [ ! -f "$1" ]; then
+    echo "The file \"$1\" does not exist."
+    exit 1
+fi
+
+type="$(file "$1")"
+if [[ ! "$type" =~ "PDF" ]]; then
+    echo "The file \"$1\" is not a PDF file."
+    exit 1
+fi
+
+pdf_name="$1"
+csv_name="$(echo "$pdf_name" | sd '\.pdf$' '.csv')"
+db_file_name="$(echo "$pdf_name" | sd '\.pdf$' '.sqlite.db')"
+
+pdftotext "$pdf_name" /tmp/suunto_report.txt
 rg '[\w\d]' /tmp/suunto_report.txt | sd '^[^\w\d]*([\w\d ]+)[^\w\d]*$' '$1' > /tmp/suunto_report_nobl.txt
-printf "id,year,month,day,time,duration,max depth,avg depth\n" > "$csv"
+printf "id,year,month,day,time,duration,max depth,avg depth\n" > "$csv_name"
 i=0
 while read line
 do
   i=$((i + 1))
   if ((i < 21)); then # exclude the first 20 lines
-    continue;
+    continue
   fi
   module=$(( (i - 20) % 8 ))
   if ((module == 1)); then
@@ -31,18 +69,29 @@ do
     max_depth="$(echo "$line" | sd '^([\d.]+)[^\d]*$' '$1')"
   elif ((module == 6)); then
     avg_depth="$(echo "$line" | sd '^([\d.]+)[^\d]*$' '$1')"
-    printf "$id,$year,$month,$day,$time,$duration,$max_depth,$avg_depth\n" >> "$csv"
+    printf "$id,$year,$month,$day,$time,$duration,$max_depth,$avg_depth\n" >> "$csv_name"
   fi
 done < /tmp/suunto_report_nobl.txt
 
 banner csv
-head "$csv" | column --separator ',' --table # print in a tabular format (print in a table)
 
+echo "
+╭────────────╮
+│ CSV sample │
+╰────────────╯
+"
+head "$csv_name" | column --separator ',' --table # print in a tabular format (print in a table)
+
+echo "
+╭────────────────────────╮
+│ SQLite 3 execution log │
+╰────────────────────────╯
+"
 banner sqlite3
 echo '> remove old DB'
-rm -f FreeDiveList_2023-02-04.sqlite.db
+rm -f "$db_file_name"
 echo '> create table "freedive"'
-sqlite3 FreeDiveList_2023-02-04.sqlite.db '
+sqlite3 "$db_file_name" '
 create table "freedive" (
   "id" integer,
   "year" integer,
@@ -52,15 +101,15 @@ create table "freedive" (
   "duration" integer,
   "max_depth" real,
   "avg_depth" real
-);
+)
 '
 echo '> import csv'
 echo "
 .mode csv
 .separator ,
-.import ${csv} freedive
-delete from freedive where id = 'id';
-" | sqlite3 FreeDiveList_2023-02-04.sqlite.db
+.import ${csv_name} freedive
+delete from freedive where id = 'id'
+" | sqlite3 "$db_file_name"
 
 banner reports
 echo "
@@ -69,11 +118,40 @@ echo "
 ╰──────────────╯
 "
 echo ".mode columns
-select year, month, max(duration), count(*)
-from freedive
-group by year, month
-order by -max(duration), year, month;
-" | sqlite3 FreeDiveList_2023-02-04.sqlite.db
+select
+    top_duration.year,
+    top_duration.month,
+    top_duration.day,
+    top_duration.duration,
+    max(depth.depth) depth
+from (
+    -- top_duration
+    select
+        year,
+        month,
+        day,
+        duration duration_secs,
+        (max(duration) / 60) || ':' || substr('0' || (max(duration) % 60), -2, 2) duration
+    from freedive
+    group by year, month, day
+) top_duration
+join (
+    select year, month, day, duration, max(max_depth) depth
+    from freedive
+    group by year, month, day, duration
+) depth
+    on top_duration.year = depth.year
+    and top_duration.month = depth.month
+    and top_duration.day = depth.day 
+    and top_duration.duration_secs = depth.duration
+group by
+    top_duration.year,
+    top_duration.month,
+    top_duration.day,
+    top_duration.duration
+order by top_duration.duration desc, top_duration.year, top_duration.month, top_duration.day
+limit 10
+" | sqlite3 "$db_file_name"
 
 echo "
 ╭───────────╮
@@ -81,9 +159,95 @@ echo "
 ╰───────────╯
 "
 echo ".mode columns
-select year, month, max(max_depth), count(*)
-from freedive
-group by year, month
-order by -max(max_depth), year, month;
-" | sqlite3 FreeDiveList_2023-02-04.sqlite.db
+select
+    top_depth.year,
+    top_depth.month,
+    top_depth.day,
+    top_depth.depth,
+    (max(duration.duration) / 60) || ':' || substr('0' || (max(duration.duration) % 60), -2, 2) duration
+from (
+    -- top_depth
+    select year, month, day, max(max_depth) depth
+    from freedive
+    group by year, month, day
+) top_depth
+join (
+    select year, month, day, max_depth, max(duration) duration
+    from freedive
+    group by year, month, day, max_depth
+) duration
+    on top_depth.year = duration.year
+    and top_depth.month = duration.month
+    and top_depth.day = duration.day 
+    and top_depth.depth = duration.max_depth
+group by
+    top_depth.year,
+    top_depth.month,
+    top_depth.day,
+    top_depth.depth
+order by top_depth.depth desc, top_depth.year, top_depth.month, top_depth.day
+limit 10
+" | sqlite3 "$db_file_name"
+echo
+
+echo "
+╭──────────────╮
+│ Last 10 days │
+╰──────────────╯
+"
+echo ".mode columns
+select *
+from (
+    -- report
+    select
+        -- row_number() over (order by deep.year, deep.month, deep.day) as row_number,
+        deep.year,
+        deep.month,
+        deep.day,
+        '(' || deep.duration || ') ' || deep.max_depth max_depth,
+        '(' || long.duration || ') ' || long.max_depth max_duration
+    from (
+        -- deep
+        select
+            freedive.year,
+            freedive.month,
+            freedive.day,
+            freedive.max_depth,
+            (max(freedive.duration) / 60) || ':' || substr('0' || (max(freedive.duration) % 60), -2, 2) duration
+        from freedive 
+        join (
+            select year, month, day, max(max_depth) max_depth
+            from freedive
+            group by year, month, day
+        ) deepdive
+            on freedive.year = deepdive.year
+            and freedive.month = deepdive.month
+            and freedive.day = deepdive.day
+            and freedive.max_depth = deepdive.max_depth
+        group by freedive.year, freedive.month, freedive.day, freedive.max_depth
+    ) deep
+    join (
+        -- long
+        select
+            freedive.year,
+            freedive.month,
+            freedive.day,
+            max(freedive.max_depth) max_depth,
+            (freedive.duration / 60) || ':' || substr('0' || (freedive.duration % 60), -2, 2) duration
+        from freedive 
+        join (select year, month, day, max(duration) max_duration
+            from freedive
+            group by year, month, day
+        ) longdive
+            on freedive.year = longdive.year
+            and freedive.month = longdive.month
+            and freedive.day = longdive.day
+            and freedive.duration = longdive.max_duration
+        group by freedive.year, freedive.month, freedive.day, freedive.duration
+    ) long on deep.year = long.year and deep.month = long.month and deep.day = long.day
+    order by deep.year desc, deep.month  desc, deep.day desc
+    limit 10
+) report
+order by year, month, day
+" | sqlite3 "$db_file_name"
 echo

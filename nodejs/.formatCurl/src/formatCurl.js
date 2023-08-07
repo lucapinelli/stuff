@@ -81,9 +81,7 @@ if (text) {
       json = properties ? pick(json, properties) : json
       if (format === 'compact') {
           if (Array.isArray(json)) {
-              console.log('[')
-              json.forEach(j => console.log('  ' + JSON.stringify(j)))
-              console.log(']')
+              console.log(`[\n${json.map(j => '  ' + JSON.stringify(j)).join(',\n')}\n]`)
           } else {
               console.log(JSON.stringify(json))            
           }

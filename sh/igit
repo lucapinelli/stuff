@@ -68,20 +68,20 @@ status() {
   git cherry -v
   label "git stash list"
   git stash list
-  label "git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*'"
-  git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*'
+  label "git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*'"
+  git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*'
 }
 
 pull() {
   label "git pull"
   git pull
   status
-  olds=$(git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*' | wc -l)
+  olds=$(git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | wc -l)
   if (( $olds > 0 )); then
     read -p "Do you want to remove the merged branches? (yes/no) " yn
     if [ "$yn" = "yes" ]; then
-      label "git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*' | xargs git branch -d"
-      git branch --merged | grep -vE ' development$| qa$| master$| release$| .*\.x$|^\*' | xargs git branch -d
+      label "git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | xargs git branch -d"
+      git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | xargs git branch -d
     fi
   fi
 }
