@@ -71,7 +71,7 @@ DEPENDENCIES:
 '
 
 if [ -z $SNIPPETS_HOME ]; then
-  SNIPPETS_HOME=~/snippets
+  SNIPPETS_HOME=~/projects/my/snippets
 fi
 
 case "$1" in
@@ -82,7 +82,7 @@ case "$1" in
     rg ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME"
   ;;
   "show" | "s")
-    #fd ${@:2:$#-2} "${@: -1}" ~/snippets -exec more
+    #fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" -exec more
     fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header --paging never
   ;;
   "clip" | "c")

@@ -5,9 +5,9 @@
 # ...
 # meld conf/bashrc ~/.bashrc
 
-###################
-# <luca was here> #
-###################
+#################
+# luca was here #
+#################
 
 HISTCONTROL=ignoreboth:erasedups
 
@@ -68,6 +68,16 @@ function title {
   fi
 }
 
+function clip_title {
+  if (( $# < 1 )); then
+    echo "Usage: clip_title <TITLE>"
+    exit 1
+  fi
+  ps1='PS1="${PS1}\[\e]2;'"$*"'\a\]"'
+  echo "$ps1" | xclip -selection c -i
+  echo "$ps1 copied to the clipboard"
+}
+
 # get the package that contains the command
 function which_package {
   dpkg -S $(which $1)
@@ -124,11 +134,15 @@ function show_alias {
 }
 
 function clip_date {
-  echo -n "$(node -e 'console.log(new Date())')" | xclip -selection c
+  now="$(node -e 'console.log(new Date())')"
+  echo -n "$now" | xclip -selection c
+  echo "$now"
 }
 
 function clip_uuid {
-  echo -n "$(uuid)" | xclip -selection c
+  next="$(uuid)"
+  echo -n "$next" | xclip -selection c
+  echo "$next"
 }
 
 ### Alias
@@ -139,6 +153,8 @@ alias ....='..; ..; ..'
 alias l='ls --group-directories-first'
 alias la='ls -a --group-directories-first'
 alias ll='show_alias ll; ls -ohN --group-directories-first'
+alias lla='show_alias lla; ls -ohNa --group-directories-first'
+alias commands='show_alias commands; compgen -A function -abc | sort -u'
 alias bp='bat --plain --paging never'
 alias trash_list='show_alias trash_list; ls -1 /home/$USER/.local/share/Trash/files'
 alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
@@ -146,16 +162,19 @@ alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Nam
 alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | rg ' install'"
 # use apt_history -B 1 to print the dates
 alias dpkg_history="show_alias dpkg_history; zcat /var/log/dpkg.log.*.gz | cat - /var/log/dpkg.log | grep -E 'install |upgrade |remove ' "
-alias colog='sd "(DEBUG)" "\033[34m\$1\033[0m" | sd "(INFO)" "\033[32m\$1\033[0m" | sd "(WARN)" "\033[33m\$1\033[0m" | sd "(ERROR)" "\033[31m\$1\033[0m"'
+alias serve='show_alias serve; miniserve --dirs-first --enable-zip --upload-files --overwrite-files --color-scheme-dark monokai --title $(basename $(pwd))'
+#alias colog='sd "(DEBUG)" "\033[34m\$1\033[0m" | sd "(INFO)" "\033[32m\$1\033[0m" | sd "(WARN)" "\033[33m\$1\033[0m" | sd "(ERROR)" "\033[31m\$1\033[0m"'
 alias git_untracked='show_alias git_untracked; git status --short --untracked-files | cut --delimiter=" " --fields=2'
 alias git_tree='show_alias git_tree; git-tree -- --format="%C(auto)%h %d %<(50,trunc)%s"'
 alias watch_modify="inotifywait -qq --event modify --recursive --exclude 'node_modules'" # e.g. while watch_modify .; do dum test; done
-alias clip='show_alias clip; xclip -selection c -i' # copy the content of the file in the clipboard
-alias clip_save='show_alias clip_save; xclip -selection c -o >' # copy the content of the clipboard in a file
-alias clip_db='show_alias clip_db; sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid -l sql && db -c "$sql" | cat'
-alias clip_dbx='show_alias clip_dbx; sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid -l sql && db -xc "$sql" | cat'
-alias clip_jq='show_alias clip_jq; j="$(xclip -selection c -o)" && echo "$j" | bat -l json --style=grid,numbers && echo "$j" | jq'
-alias bottom='show_alias bottom; xfce4-terminal --title=bottom --geometry=128x48+100+100 --command "btm --mem_as_value -g" &'
+alias clip='xclip -selection c -i' # copy the content of the file or of the piped input in the clipboard
+alias clip_cat='xclip -selection c -o' # cat the clipboard
+alias clip_save='xclip -selection c -o >' # copy the content of the clipboard in a file
+alias clip_db='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\""'
+alias clip_dbx='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -xc "$sql" | cat && history -s "db -xc \"${sql}\""'
+alias clip_jq='j="$(xclip -selection c -o)" && echo "$j" | bat -l json --style=grid,numbers && echo "$j" | jq'
+#alias bottom='show_alias bottom; xfce4-terminal --title=bottom --geometry=128x48+100+100 --command "btm --mem_as_value -g" &'
+alias bottom='show_alias bottom; gnome-terminal --title=bottom --geometry=128x48+100+100 -- btm --mem_as_value -g'
 alias jsonkv="jq -r '
 paths(scalars) as \$p
   | [ ([\$p[] | tostring] | join(\".\")), (getpath(\$p) | tojson) ]
@@ -166,6 +185,9 @@ alias saysomething='show_alias saysomething; fortune | cowsay -f `ls /usr/share/
 alias speak='show_alias speak; espeak -g 4 -s 110'
 alias xopen='show_alias xopen; xdg-open'
 alias youtube-mp3='show_alias youtube-mp3; youtube-dl --extract-audio --audio-format mp3'
+alias yt-mp3='show_alias yt-mp3; yt-dlp --extract-audio --audio-format mp3'
+alias render_html='lynx --stdin -dump -width 160'
+alias weather='show_alias weather; curl wttr.in'
 
 alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -framerate 8 -f x11grab -i :0+0:0 -video_size 1920x1080'
 alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'
@@ -184,6 +206,6 @@ google-chrome \
 
 export PATH="$PATH:/home/luca/projects/my/stuff/sh:/home/luca/projects/my/stuff/zx:/home/luca/projects/my/stuff/nodejs:/opt/bin"
 
-####################
-# </luca was here> #
-####################
+################
+# luca is gone #
+################

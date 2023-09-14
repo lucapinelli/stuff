@@ -23,4 +23,5 @@ rm-improved: rip: Deletion tool. Deleted files get sent to the graveyard
 ruplacer: ruplacer: find and replace text in source files
 watchexec-cli: watchexec: standalone tool that watches a path and runs a command whenever it detects modifications
 kondo: kondo: cleans node_modules, target, build, and friends from your projects
-bartib: bartib: time tracker tool
+bunyan: bunyan: pretty print structured logs
+tre-command: tre: a modern alternative to the tree command
