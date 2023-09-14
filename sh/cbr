@@ -47,7 +47,7 @@ case $1 in
       rustup update
       echo -e "\nInstalling/upgrading binstall..."
       if [ ! -e "~/.cargo/bin/cargo-binstall" ] ; then
-        cargo binstall cargo-binstall
+        cargo binstall -y cargo-binstall
       else
         cargo install cargo-binstall
       fi
@@ -55,7 +55,7 @@ case $1 in
       for crate in $(awk -F ': ' '{print $1}' cargo.register | sort); do
         echo -e "\nInstalling/upgrading create ${crate}..."
         echo "$ cargo binstall $crate"
-        cargo binstall $crate
+        cargo binstall -y $crate
       done
     )
   ;;

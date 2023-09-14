@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+set -e # exit if a commands returns a non-zero value
+
+HELP="
+NAME
+  wakeful - do not leet you laptop to sleep
+
+USAGE
+  wakeful
+
+REQUIRES
+  xdotool (sudo apt install xdotool)
+"
+
+if ! command -v xdotool &> /dev/null
+then
+    echo "Command xdotool not found, install it using: sudo apt install xdotool"
+    exit
+fi
+
+# if [ "$(type -t banner)" == "file" ]
+if command -v banner &> /dev/null
+then
+    banner wakeful
+fi
+
+echo "started at $(date)"
+
+mouse_x=0
+mouse_y=0
+mouse_screen=0
+mouse_window=0
+update_mouse_location () {
+  eval "$(xdotool getmouselocation --shell)" #  this will set the variables: X, Y, SCREEN, WINDOW
+  mouse_x="$X"
+  mouse_y="$X"
+  mouse_screen="$SCREEN"
+  mouse_window="$WINDOW"
+}
+
+previous_x=0
+previous_y=0
+previous_screen=0
+previous_window=0
+update_previous_location () {
+  update_mouse_location
+  previous_x=$mouse_x
+  previous_y=$mouse_y
+  previous_screen=$mouse_screen
+  previous_window=$mouse_window
+}
+
+update_previous_location
+
+awaken () {
+  update_mouse_location
+
+  # if mouse not moved
+  if (( previous_x == mouse_x && previous_y == mouse_y && previous_screen == mouse_screen )); then
+    # do not let the laptop to go asleep
+    echo "wakeful $(date)"
+    xdotool mousemove_relative -- 0 -10
+    xdotool sleep 0.1
+    xdotool mousemove_relative -- -10 0
+    xdotool sleep 0.1
+    xdotool mousemove_relative 0 10
+    xdotool sleep 0.1
+    xdotool mousemove_relative 10 0
+  fi
+
+  update_previous_location
+}
+
+while true; do
+  sleep 120
+  awaken
+done
