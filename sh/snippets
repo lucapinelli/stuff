@@ -74,6 +74,14 @@ if [ -z $SNIPPETS_HOME ]; then
   SNIPPETS_HOME=~/projects/my/snippets
 fi
 
+if [ -z $SNIPPETS_IDE ]; then
+  SNIPPETS_IDE=lapce
+fi
+
+if [ -z $SNIPPETS_EDITOR ]; then
+  SNIPPETS_EDITOR=hx
+fi
+
 case "$1" in
   "find" | "fd")
     fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME"
@@ -83,20 +91,20 @@ case "$1" in
   ;;
   "show" | "s")
     #fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" -exec more
-    fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header --paging never
+    fd --type f ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header --paging never
   ;;
   "clip" | "c")
     xclip -sel c -i "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
     bat "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "edit" | "e")
-    hx "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    $SNIPPETS_EDITOR "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "all" | "a")
-    lapce "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    $SNIPPETS_IDE "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "open" | "o")
-    lapce "$SNIPPETS_HOME"
+    $SNIPPETS_IDE "$SNIPPETS_HOME"
   ;;
   *)
     echo -e "$HELP"
