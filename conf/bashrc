@@ -83,6 +83,20 @@ function which_package {
   dpkg -S $(which $1)
 }
 
+function doc {
+  mkdir -p /tmp/alldoc 
+  if [ ! -f /tmp/alldoc/$1.txt ]; then
+    banner cht.sh 2>&1 | ansi2txt > /tmp/alldoc/$1.txt
+    cht.sh $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    banner help 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    $1 --help 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    banner man 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    man $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+  fi
+  lapce /tmp/alldoc/$1.txt  
+}
+
+
 function dict {
   curl "https://api.dictionaryapi.dev/api/v2/entries/en/$1" \
   | formatCurl \
@@ -159,9 +173,8 @@ alias bp='bat --plain --paging never'
 alias trash_list='show_alias trash_list; ls -1 /home/$USER/.local/share/Trash/files'
 alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
 alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
-alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | rg ' install'"
-# use apt_history -B 1 to print the dates
-alias dpkg_history="show_alias dpkg_history; zcat /var/log/dpkg.log.*.gz | cat - /var/log/dpkg.log | grep -E 'install |upgrade |remove ' "
+alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | sd ' \([^)]+\)' '' | sd ':amd64' '' | sd ',' '' | rg 'Install|Upgrade|Remove|Purge'"
+alias dpkg_history="show_alias dpkg_history; zcat /var/log/dpkg.log.*.gz | cat - /var/log/dpkg.log | rg 'install |upgrade |remove ' "
 alias serve='show_alias serve; miniserve --dirs-first --enable-zip --upload-files --overwrite-files --color-scheme-dark monokai --title $(basename $(pwd))'
 #alias colog='sd "(DEBUG)" "\033[34m\$1\033[0m" | sd "(INFO)" "\033[32m\$1\033[0m" | sd "(WARN)" "\033[33m\$1\033[0m" | sd "(ERROR)" "\033[31m\$1\033[0m"'
 alias git_untracked='show_alias git_untracked; git status --short --untracked-files | cut --delimiter=" " --fields=2'
