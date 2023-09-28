@@ -9,7 +9,7 @@ const exec = util.promisify(childProcess.exec)
 const usage = `
 
   NAME
-    allfiles - exceutes the specified command on all the files in the working directory
+    allfiles - executes the specified command on all the files in the working directory
 
   USAGE
     allfiles COMMAND_STRING
@@ -63,4 +63,4 @@ const main = async () => {
   })
 }
 
-main().catch(e => console.log('An error occured:', e))
+main().catch(e => console.log('An error occurred:', e))

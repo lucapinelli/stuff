@@ -22,8 +22,8 @@ ${bold}Examples${norm}
 # show the last 20 items in the history
 cq h
 
-# show the items in the history that match 'jabba' (case insensitive)
-cq h jabba
+# show the items in the history that match 'prune' (case insensitive)
+cq h prune
 
 # select the item at index 10
 cq s 10

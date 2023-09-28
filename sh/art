@@ -74,7 +74,7 @@ case "$2" in
   "rainbow")
     echo
     count=0
-    while IFS= read line; do # IFS= will preseve the spaces otherwise the line is trimmed
+    while IFS= read line; do # IFS= will preserve the spaces otherwise the line is trimmed
       echo -en "${colors[($count % 7)]}"
       echo "$line"
       count=$(($count + 1))
@@ -85,7 +85,7 @@ case "$2" in
   "rainbow2")
     # random color for each line
     echo
-    while IFS= read line; do # IFS= will preseve the spaces otherwise the line is trimmed
+    while IFS= read line; do # IFS= will preserve the spaces otherwise the line is trimmed
       echo -en "${colors[$((RANDOM % 7))]}"
       echo "$line"
     done < "$path"
@@ -96,7 +96,7 @@ case "$2" in
     # rainbow on each char
     echo
     count=0
-    while IFS= read  -r -d '' -n 1 char; do # IFS= will preseve the spaces otherwise the line is trimmed
+    while IFS= read  -r -d '' -n 1 char; do # IFS= will preserve the spaces otherwise the line is trimmed
       echo -en "${colors[($count % 7)]}"
       echo -n "$char"
       count=$(($count + 1))
@@ -107,9 +107,9 @@ case "$2" in
   "rainbow4")
     # rainbow on each char keeping the same color for the same position
     echo
-    while IFS= read line; do # IFS= will preseve the spaces otherwise the line is trimmed
+    while IFS= read line; do # IFS= will preserve the spaces otherwise the line is trimmed
       count=0
-      while IFS= read  -r -d '' -n 1 char; do # IFS= will preseve the spaces otherwise the line is trimmed
+      while IFS= read  -r -d '' -n 1 char; do # IFS= will preserve the spaces otherwise the line is trimmed
         echo -en "${colors[($count % 7)]}"
         echo -n "$char"
         count=$(($count + 1))
@@ -122,7 +122,7 @@ case "$2" in
   "rainbow5")
     # rainbow on each char random
     echo
-    while IFS= read  -r -d '' -n 1 char; do # IFS= will preseve the spaces otherwise the line is trimmed
+    while IFS= read  -r -d '' -n 1 char; do # IFS= will preserve the spaces otherwise the line is trimmed
       echo -en "${colors[$((RANDOM % 7))]}"
       echo -n "$char"
     done < "$path"

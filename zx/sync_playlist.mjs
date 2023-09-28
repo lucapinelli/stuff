@@ -8,7 +8,7 @@ $.verbose = false
 const showHelp = () => {
   console.info(`
 USAGE:
-  sync_playlist.mjs "Sunday morning.m3u" "/media/luca/NABAIJI MP3"
+  sync_playlist.mjs "Sunday morning.m3u" "/media/luca/USB PEN DRIVE XYZ"
 `)
 }
 

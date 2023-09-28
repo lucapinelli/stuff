@@ -17,6 +17,7 @@ if (process.argv && process.argv[2]) {
     process.exit()
   }
 } else {
+  // cspell:disable-next
   const stdinBuffer = fs.readFileSync(0) // STDIN_FILENO = 0
   text = stdinBuffer.toString()
 }

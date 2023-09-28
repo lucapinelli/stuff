@@ -5,12 +5,13 @@ set -e # -e  exit immediately when a command fails
 
 if [[ -z "$2" ]]; then
   echo "
-  SYNOPSY
+  SYNOPSIS
+
   encode_file FILE_TO_ENCODE FILE_ENCODED
 
   You can define and export the environment variable SECRET
   to encode /decode multiple files using the same password, e.g.:
-  export SECRET=dontspeaktwice
+  export SECRET=don@t@speak@twice
   "
   exit
 fi

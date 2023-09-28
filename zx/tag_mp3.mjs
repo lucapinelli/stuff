@@ -42,7 +42,7 @@ const main = async () => {
   files.forEach(file => {
     const { artist, title } = generateMeta(file)
     if (!artist || !title) {
-      console.warn('file "%s" discarted.', file)
+      console.warn('file "%s" discarded.', file)
       return
     }
     console.info(file, '::', { artist, title })

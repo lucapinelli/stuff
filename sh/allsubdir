@@ -2,7 +2,7 @@
 
 HELP="
 NAME
-  allsubdir - exceutes the specified command in all the sub directories of the working directory
+  allsubdir - executes the specified command in all the sub directories of the working directory
 
 USAGE
   allsubdir \"COMMAND_STRING\"

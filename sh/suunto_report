@@ -7,8 +7,8 @@ suunto_report 1.0.0
 Luca Pinelli
 
 suunto_report builds an show a report of your free dive using the PDF export file
-from Suunto DM5. Additionally you will find in this foldera SQLite 3 database and
-a CSV file contining all the data extracted from the PDF.
+from Suunto DM5. Additionally you will find in this folder a SQLite 3 database and
+a CSV file containing all the data extracted from the PDF.
 
 USAGE:
   suunto_report PDF_PATH
@@ -44,7 +44,7 @@ csv_name="$(echo "$pdf_name" | sd '\.pdf$' '.csv')"
 
 create_csv() {
   pdftotext "$pdf_name" /tmp/suunto_report.txt
-  rg '[\w\d]' /tmp/suunto_report.txt | sd '^[^\w\d]*([\w\d ]+)[^\w\d]*$' '$1' > /tmp/suunto_report_nobl.txt
+  rg '[\w\d]' /tmp/suunto_report.txt | sd '^[^\w\d]*([\w\d ]+)[^\w\d]*$' '$1' > /tmp/suunto_report_clean.txt
   printf "id,year,month,day,time,duration,duration_secs,max depth,avg depth\n" > "$csv_name"
   i=0
   while read line
@@ -73,7 +73,7 @@ create_csv() {
       avg_depth="$(echo "$line" | sd '^([\d.]+)[^\d]*$' '$1')"
       printf "$id,$year,$month,$day,$time,$duration,$duration_secs,$max_depth,$avg_depth\n" >> "$csv_name"
     fi
-  done < /tmp/suunto_report_nobl.txt
+  done < /tmp/suunto_report_clean.txt
 }
 
 echo "extract the data from the PDF and create the CSV file..."
@@ -227,7 +227,7 @@ report () {
       group by year, month, day
       order by cast(round(avg(duration_secs)) as int) desc
       limit 10
-    ) meanday
+    ) mean_day
     " | sqlite3 "$db_file_name"
 
     echo "

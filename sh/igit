@@ -40,11 +40,11 @@ ACTIONS:
     restore the specified file/directory to the original content
 
   apply <file.patch>
-    applyes the specified patch
+    applies the specified patch
 
   list [OPT]
     list file that has been:
-    ?, untraked
+    ?, untracked
     A, added
     M, modified
     D, deleted

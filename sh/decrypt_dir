@@ -2,12 +2,13 @@
 
 if [ -z "$1" ] || [ "$1" == "--help" ]; then
   echo "
-  SYNOPSY
+  SYNOPSIS
+
   decrypt_dir DIR_PATH
 
   You need to define and export the environment variable SECRET to use this utility,
   e.g.:
-  export SECRET=dontspeaktwice
+  export SECRET=don@t@speak@twice
   "
   exit
 fi
@@ -16,7 +17,7 @@ if [[ -z "${SECRET}" ]]; then
   echo "
   You need to define and export the environment variable SECRET to use this utility,
   e.g.:
-  export SECRET=dontspeaktwice
+  export SECRET=don@t@speak@twice
   "
   exit
 fi
@@ -29,8 +30,8 @@ if ((decrypted > 0)); then
   exit
 fi
 
-if key="$(increaseKeyLenght "$SECRET" 128000)"; then
-  # increaseKeyLenght completed successfully
+if key="$(increaseKeyLength "$SECRET" 128000)"; then
+  # increaseKeyLength completed successfully
   echo -e '\033[00;34m + xor --decrypt -k "$key" -r .\033[00m'
   xor --decrypt -k "$key" -r .
 else

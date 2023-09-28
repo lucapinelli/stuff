@@ -9,19 +9,19 @@
 # luca was here #
 #################
 
-HISTCONTROL=ignoreboth:erasedups
+HISTCONTROL=ignoreboth:erasedups # cspell:disable-line
 
 ### Completion and Colorize
 
 if [ "$(whoami)" != "root" ]; then
-  PS1='${debian_chiroot:+($debian_chroot)}'
+  PS1='${debian_chiroot:+($debian_chroot)}' # cspell:disable-line
   PS1=$PS1'\[\033[00;36m\]$(date +"%H:%M:%S") '
   PS1=$PS1'\[\033[00;32m\]\u@\h '
   PS1=$PS1'\[\033[01;34m\]\w'
   PS1=$PS1'\[\033[00;34m\]$(__git_ps1)'
   PS1=$PS1'\[\033[00m\] \$ '
 else
-  PS1='${debian_chiroot:+($debian_chroot)}'
+  PS1='${debian_chiroot:+($debian_chroot)}' # cspell:disable-line
   PS1=$PS1'\[\033[00;36m\]$(date +"%H:%M:%S") '
   PS1=$PS1'\[\033[00;33m\]\u@\h '
   PS1=$PS1'\[\033[01;34m\]\w'
@@ -31,7 +31,7 @@ fi
 
 # If this is an xterm set the window title to user@host:dir
 case "$TERM" in
-xterm*|rxvt*)
+xterm*|rxvt*) # cspell:disable-line
     PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
     ;;
 *)
@@ -147,7 +147,7 @@ function wait_for {
     eval "$1" &> /dev/null
     status=$?
   done
-  echo " completed sucessfully"
+  echo " completed successfully"
 }
 
 function show_alias {
@@ -202,6 +202,7 @@ alias l='ls --group-directories-first'
 alias la='ls -a --group-directories-first'
 alias ll='show_alias ll; ls -ohN --group-directories-first'
 alias lla='show_alias lla; ls -ohNa --group-directories-first'
+# // cspell:disable-next
 alias commands='show_alias commands; compgen -abckA function | sort -u'
 alias bp='bat --plain --paging never'
 alias trash_list='show_alias trash_list; ls -1 /home/$USER/.local/share/Trash/files'
@@ -234,7 +235,7 @@ alias yt-mp3='show_alias yt-mp3; yt-dlp --extract-audio --audio-format mp3'
 alias render_html='lynx --stdin -dump -width 160'
 alias weather='show_alias weather; curl wttr.in'
 
-alias db='psql -U postgres -h localhost -p 5432 mydb'
+alias db='psql -U postgres -h localhost -p 5432 mydb' # cspell:disable-line
 alias db_clip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\""'
 alias dbx_clip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -xc "$sql" | cat && history -s "db -xc \"${sql}\""'
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 const help = `
-USAGE: increaseKeyLenght [key]
+USAGE: increaseKeyLength [key]
 
 Example:
-  increaseKeyLenght 'machebelcastello' 100
+  increaseKeyLength 'aBeautifulCastle' 100
 `
 
 let key = process.argv[2]

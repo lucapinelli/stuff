@@ -4,7 +4,7 @@ if [[ -z "${SECRET}" ]]; then
   echo "
   You need to define and export the environment variable SECRET, e.g.:
 
-  export SECRET=dontspeaktwice
+  export SECRET=don@t@speak@twice
   "
   exit
 fi

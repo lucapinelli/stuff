@@ -2,12 +2,12 @@
 
 if [[ -z "$1" || "$1" == "--help" ]]; then
   echo "
-  SYNOPSY
+  SYNOPSIS
   decode_file FILE_TO_DECODE [FILE_DECODED]
 
   You can define and export the environment variable SECRET
   to encode /decode multiple files using the same password, e.g.:
-  export SECRET=dontspeaktwice
+  export SECRET=don@t@speak@twice
 
   If the FILE_DECODED parameter is not specified the output will
   be print on the stdout.

@@ -7,7 +7,7 @@ Scripts and notes about stuff that I use often.
 ### Compile and run a Rust script (without Cargo)
 
 ```bash
-function rustrun {
+function rust_run {
     name=$(echo $1 | sed 's/\.rs$//') \
     && echo "# FORMAT: rustfmt $1" \
     && rustfmt $1 \
@@ -50,7 +50,7 @@ xsel --clipboard < new-clipboard-contents.txt
 xsel --clipboard
 ```
 
-Alternativelly you can use
+Alternatively you can use
 
 ```bash
 xclip -sel clip < new-clipboard-contents.txt
