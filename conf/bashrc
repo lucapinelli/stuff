@@ -86,16 +86,25 @@ function which_package {
 function doc {
   mkdir -p /tmp/alldoc 
   if [ ! -f /tmp/alldoc/$1.txt ]; then
-    banner cht.sh 2>&1 | ansi2txt > /tmp/alldoc/$1.txt
+    banner cht.sh | sd '╋' '┼' | ansi2txt > /tmp/alldoc/$1.txt
     cht.sh $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
-    banner help 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    banner help | sd '╋' '┼' | ansi2txt >> /tmp/alldoc/$1.txt
     $1 --help 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
-    banner man 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    banner man | sd '╋' '┼' | ansi2txt >> /tmp/alldoc/$1.txt
     man $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
   fi
-  lapce /tmp/alldoc/$1.txt  
+  gedit /tmp/alldoc/$1.txt  
 }
 
+NOTES_PATH="~/projects/my/notes"
+STUFF_PATH="~/projects/my/stuff"
+ZIMNOTE_PATH="~/projects/my/zimnote"
+function everywhere {
+  snippets ${@:1:$#-1} "${@: -1}"
+  SNIPPETS_HOME="$NOTES_PATH" snippets ${@:1:$#-1} "${@: -1}"
+  SNIPPETS_HOME="$STUFF_PATH" snippets ${@:1:$#-1} "${@: -1}"
+  SNIPPETS_HOME="$ZIMNOTE_PATH" snippets ${@:1:$#-1} "${@: -1}"
+}
 
 function dict {
   curl "https://api.dictionaryapi.dev/api/v2/entries/en/$1" \
@@ -159,6 +168,31 @@ function clip_uuid {
   echo "$next"
 }
 
+function is_command {
+  found=$(compgen -c | rg "^$1$" | wc -l)
+  if (( found > 0 )); then echo true; else echo false; fi
+}
+
+function is_alias {
+  found=$(compgen -a | rg "^$1$" | wc -l)
+  if (( found > 0 )); then echo true; else echo false; fi
+}
+
+function is_function {
+  found=$(compgen -A function | rg "^$1$" | wc -l)
+  if (( found > 0 )); then echo true; else echo false; fi
+}
+
+function is_builtin {
+  found=$(compgen -b | rg "^$1$" | wc -l)
+  if (( found > 0 )); then echo true; else echo false; fi
+}
+
+function is_keyword {
+  found=$(compgen -k | rg "^$1$" | wc -l)
+  if (( found > 0 )); then echo true; else echo false; fi
+}
+
 ### Alias
 
 alias ..='cd ..'
@@ -168,7 +202,7 @@ alias l='ls --group-directories-first'
 alias la='ls -a --group-directories-first'
 alias ll='show_alias ll; ls -ohN --group-directories-first'
 alias lla='show_alias lla; ls -ohNa --group-directories-first'
-alias commands='show_alias commands; compgen -A function -abc | sort -u'
+alias commands='show_alias commands; compgen -abckA function | sort -u'
 alias bp='bat --plain --paging never'
 alias trash_list='show_alias trash_list; ls -1 /home/$USER/.local/share/Trash/files'
 alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
@@ -183,8 +217,6 @@ alias watch_modify="inotifywait -qq --event modify --recursive --exclude 'node_m
 alias clip='xclip -selection c -i' # copy the content of the file or of the piped input in the clipboard
 alias clip_cat='xclip -selection c -o' # cat the clipboard
 alias clip_save='xclip -selection c -o >' # copy the content of the clipboard in a file
-alias clip_db='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\""'
-alias clip_dbx='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -xc "$sql" | cat && history -s "db -xc \"${sql}\""'
 alias clip_jq='j="$(xclip -selection c -o)" && echo "$j" | bat -l json --style=grid,numbers && echo "$j" | jq'
 #alias bottom='show_alias bottom; xfce4-terminal --title=bottom --geometry=128x48+100+100 --command "btm --mem_as_value -g" &'
 alias bottom='show_alias bottom; gnome-terminal --title=bottom --geometry=128x48+100+100 -- btm --mem_as_value -g'
@@ -202,11 +234,18 @@ alias yt-mp3='show_alias yt-mp3; yt-dlp --extract-audio --audio-format mp3'
 alias render_html='lynx --stdin -dump -width 160'
 alias weather='show_alias weather; curl wttr.in'
 
+alias db='psql -U postgres -h localhost -p 5432 mydb'
+alias db_clip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\""'
+alias dbx_clip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -xc "$sql" | cat && history -s "db -xc \"${sql}\""'
+
+alias stuff="SNIPPETS_HOME=~/projects/my/stuff snippets"
+alias notes="SNIPPETS_HOME=~/projects/my/notes snippets"
+alias zimnote="SNIPPETS_HOME=~/projects/my/zimnote snippets"
+
 alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -framerate 8 -f x11grab -i :0+0:0 -video_size 1920x1080'
 alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'
 alias ffdisplay2small='show_alias ffdisplay2small; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 1920x1080'
 alias ffwebcam='show_alias ffwebcam; ffplay -window_title "Webcam" -framerate 8 -f video4linux2 -i /dev/video0 -video_size 240x240'
-alias render_html='lynx --stdin -dump -width 160'
 
 alias chrome_unsafe='
 google-chrome \
@@ -215,9 +254,8 @@ google-chrome \
   --unsafely-treat-insecure-origin-as-secure=https://localhost
 '
 
-### Paths
-
-export PATH="$PATH:/home/luca/projects/my/stuff/sh:/home/luca/projects/my/stuff/zx:/home/luca/projects/my/stuff/nodejs:/opt/bin"
+### PATH
+export PATH="$PATH:/opt/bin:$STUFF_PATH/sh:$STUFF_PATH/zx:$STUFF_PATH/nodejs"
 
 ################
 # luca is gone #

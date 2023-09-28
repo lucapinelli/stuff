@@ -72,6 +72,8 @@ DEPENDENCIES:
 
 if [ -z $SNIPPETS_HOME ]; then
   SNIPPETS_HOME=~/projects/my/snippets
+else
+  SNIPPETS_HOME=$(echo $SNIPPETS_HOME | sd '^~' "$HOME")
 fi
 
 if [ -z $SNIPPETS_IDE ]; then
@@ -98,13 +100,13 @@ case "$1" in
     bat "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "edit" | "e")
-    $SNIPPETS_EDITOR "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    "$SNIPPETS_EDITOR" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "all" | "a")
-    $SNIPPETS_IDE "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    "$SNIPPETS_IDE" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "open" | "o")
-    $SNIPPETS_IDE "$SNIPPETS_HOME"
+    "$SNIPPETS_IDE" "$SNIPPETS_HOME"
   ;;
   *)
     echo -e "$HELP"

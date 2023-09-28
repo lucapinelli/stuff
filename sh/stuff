@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-SNIPPETS_HOME=~/projects/my/stuff snippets ${@:1:$#-1} "${@: -1}"
