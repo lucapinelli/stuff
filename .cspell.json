@@ -4,8 +4,10 @@
     "version": "0.2",
     // language - current active spelling language
     "language": "en",
-    // import the global configuration
-    "import": ["../cspell.json"],
+    // import other configurations
+    "import": [
+        "./conf/cspell.json" // my base cspell configuration
+    ],
     // words - list of words to be always considered correct
     "words": [
         "alldoc",

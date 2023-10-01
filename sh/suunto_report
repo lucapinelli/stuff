@@ -129,105 +129,92 @@ echo "
 report () {
 
     echo "
-    ╭───────────╮
-    │ Top depth │
-    ╰───────────╯
-    "
-    echo ".mode columns
-    select
-        top_depth.year,
-        top_depth.month,
-        top_depth.day,
-        top_depth.depth,
-        (max(duration.duration_secs) / 60) || ':' || substr('0' || (max(duration.duration_secs) % 60), -2, 2) duration
-    from (
-        -- top_depth
-        select year, month, day, max(max_depth) depth
-        from freedive
-        group by year, month, day
-    ) top_depth
-    join (
-        select year, month, day, max_depth, max(duration_secs) duration_secs
-        from freedive
-        group by year, month, day, max_depth
-    ) duration
-        on top_depth.year = duration.year
-        and top_depth.month = duration.month
-        and top_depth.day = duration.day
-        and top_depth.depth = duration.max_depth
-    group by
-        top_depth.year,
-        top_depth.month,
-        top_depth.day,
-        top_depth.depth
-    order by top_depth.depth desc, top_depth.year, top_depth.month, top_depth.day
-    limit 10
-    " | sqlite3 "$db_file_name"
-    echo
-
-    echo "
     ╭──────────────╮
     │ Top duration │
     ╰──────────────╯
     "
     echo ".mode columns
     select
-        top_duration.year,
-        top_duration.month,
-        top_duration.day,
-        top_duration.duration,
-        max(depth.depth) depth
-    from (
-        -- top_duration
-        select
-            year,
-            month,
-            day,
-            duration_secs,
-            (max(duration_secs) / 60) || ':' || substr('0' || (max(duration_secs) % 60), -2, 2) duration
+        f.year,
+        substr('  ' || max(f.month), -2, 2) month,
+        substr('  ' || max(f.day), -2, 2) day,
+        (max(f.duration_secs) / 60) || ':' || substr('0' || (max(f.duration_secs) % 60), -2, 2) duration,
+        max(max_depth) max_depth,
+        max(avg_depth) avg_depth
+    from freedive f
+    join (
+        select year, month, day, max(duration_secs) duration_secs
         from freedive
         group by year, month, day
-    ) top_duration
-    join (
-        select year, month, day, duration_secs, max(max_depth) depth
-        from freedive
-        group by year, month, day, duration_secs
-    ) depth
-        on top_duration.year = depth.year
-        and top_duration.month = depth.month
-        and top_duration.day = depth.day
-        and top_duration.duration_secs = depth.duration_secs
-    group by
-        top_duration.year,
-        top_duration.month,
-        top_duration.day,
-        top_duration.duration
-    order by top_duration.duration desc, top_duration.year, top_duration.month, top_duration.day
-    limit 10
+        order by max(duration_secs) desc
+        limit 10
+    ) top
+        on top.year = f.year
+        and top.month = f.month
+        and top.day = f.day
+        and top.duration_secs = f.duration_secs
+    group by f.year, f.month, f.day
+    order by max(f.duration_secs) desc
     " | sqlite3 "$db_file_name"
 
+
     echo "
-    ╭───────────────────────╮
-    │ Top day mean duration │
-    ╰───────────────────────╯
+    ╭───────────╮
+    │ Top depth │
+    ╰───────────╯
     "
     echo ".mode columns
     select
-      year,
-      month,
-      day,
-      (avg_sec / 60) || ':' || substr('0' || (avg_sec % 60), -2, 2) avg_duration
-    from (
-      select
-        year,
-        month,
-        day,
-        cast(round(avg(duration_secs)) as int) avg_sec
-      from freedive
-      group by year, month, day
-      order by cast(round(avg(duration_secs)) as int) desc
-      limit 10
-    ) mean_day
+        f.year,
+        substr('  ' || max(f.month), -2, 2) month,
+        substr('  ' || max(f.day), -2, 2) day,
+        (max(duration_secs) / 60) || ':' || substr('0' || (max(duration_secs) % 60), -2, 2) duration,
+        max(f.max_depth) max_depth,
+        max(avg_depth) avg_depth
+    from freedive f
+    join (
+        select year, month, day, max(max_depth) max_depth
+        from freedive
+        group by year, month, day
+        order by max(max_depth) desc
+        limit 10
+    ) top
+        on top.year = f.year
+        and top.month = f.month
+        and top.day = f.day
+        and top.max_depth = f.max_depth
+    group by f.year, f.month, f.day
+    order by max(f.max_depth) desc
+    " | sqlite3 "$db_file_name"
+    echo
+
+    echo "
+    ╭────────────────╮
+    │ Top mean depth │
+    ╰────────────────╯
+    "
+    echo ".mode columns
+    select
+        f.year,
+        substr('  ' || max(f.month), -2, 2) month,
+        substr('  ' || max(f.day), -2, 2) day,
+        (max(duration_secs) / 60) || ':' || substr('0' || (max(duration_secs) % 60), -2, 2) duration,
+        max(max_depth) max_depth,
+        max(f.avg_depth) avg_depth
+    from freedive f
+    join (
+        select year, month, day, max(avg_depth) avg_depth
+        from freedive
+        group by year, month, day
+        order by max(avg_depth) desc
+        limit 10
+    ) top
+        on top.year = f.year
+        and top.month = f.month
+        and top.day = f.day
+        and top.avg_depth = f.avg_depth
+    group by f.year, f.month, f.day
+    order by max(f.avg_depth) desc
     " | sqlite3 "$db_file_name"
 
     echo "
@@ -236,68 +223,51 @@ report () {
     ╰────────────────╯
     "
     echo ".mode columns
-    select *
-    from (
-        -- report
-        select
-            mean.year,
-            mean.month,
-            '(' || deep.duration || ') ' || deep.max_depth max_depth,
-            '(' || long.duration || ') ' || long.max_depth max_duration,
-            '(' || mean.duration || ') ' || mean.depth mean
-        from (
-          -- mean
-          select
-              freedive.year,
-              freedive.month,
-              cast( (avg(freedive.duration_secs) / 60) as int)
-                || ':'
-                || substr('0' || cast( (avg(freedive.duration_secs) % 60) as int), -2, 2)
-                duration,
-              round(avg(freedive.max_depth), 1) depth
+    select
+      substr('  ' || max(freedive.month), -2, 2) month,
+      substr('  ' || max(freedive.day), -2, 2) day,
+      max_duration.duration top_duration,
+      max_depth.depth top_depth
+    from freedive
+    join (
+      -- monthly max duration
+      select
+          f.year,
+          f.month,
+          (max(f.duration_secs) / 60) || ':' || substr('0' || (max(f.duration_secs) % 60), -2, 2)
+          || ' (' || substr('    ' || max(f.max_depth), -4, 4) || ')' duration
+      from freedive f
+      join (
+          select year, month, max(duration_secs) duration_secs
           from freedive
-          where freedive.year >= 2023
-          group by freedive.year, freedive.month
-          order by freedive.year desc, freedive.month  desc
-        ) mean
-        join (
-            -- deep
-            select
-                freedive.year,
-                freedive.month,
-                freedive.max_depth,
-                (max(freedive.duration_secs) / 60) || ':' || substr('0' || (max(freedive.duration_secs) % 60), -2, 2) duration
-            from freedive
-            join (
-                select year, month, max(max_depth) max_depth
-                from freedive
-                group by year, month
-            ) deepdive
-                on freedive.year = deepdive.year
-                and freedive.month = deepdive.month
-                and freedive.max_depth = deepdive.max_depth
-            group by freedive.year, freedive.month, freedive.max_depth
-        ) deep on deep.year = mean.year and deep.month = mean.month
-        join (
-            -- long
-            select
-                freedive.year,
-                freedive.month,
-                max(freedive.max_depth) max_depth,
-                (freedive.duration_secs / 60) || ':' || substr('0' || (freedive.duration_secs % 60), -2, 2) duration
-            from freedive
-            join (select year, month, max(duration_secs) max_duration
-                from freedive
-                group by year, month
-            ) longdive
-                on freedive.year = longdive.year
-                and freedive.month = longdive.month
-                and freedive.duration_secs = longdive.max_duration
-            group by freedive.year, freedive.month, freedive.duration_secs
-        ) long on long.year = mean.year and long.month = mean.month
-        order by deep.year desc, deep.month desc
-    ) report
-    order by year, month
+          group by year, month
+      ) top
+          on top.year = f.year
+          and top.month = f.month
+          and top.duration_secs = f.duration_secs
+      group by f.year, f.month
+    ) max_duration on max_duration.year = freedive.year and max_duration.month = freedive.month
+    join (
+      -- monthly max depth
+      select
+          f.year,
+          f.month,
+          '(' || (max(f.duration_secs) / 60) || ':' || substr('0' || (max(f.duration_secs) % 60), -2, 2) || ') '
+          || substr('    ' || max(f.max_depth), -4, 4) depth
+      from freedive f
+      join (
+          select year, month, max(max_depth) max_depth
+          from freedive
+          group by year, month
+      ) top
+          on top.year = f.year
+          and top.month = f.month
+          and top.max_depth = f.max_depth
+      group by f.year, f.month
+    ) max_depth on max_depth.year = freedive.year and max_depth.month = freedive.month
+    where freedive.year >= 2023
+    group by freedive.year, freedive.month
+    order by freedive.year, freedive.month
     " | sqlite3 "$db_file_name"
 
     echo "
@@ -308,72 +278,64 @@ report () {
     echo ".mode columns
     select *
     from (
-        -- report
+      select
+        freedive.year,
+        substr('  ' || max(freedive.month), -2, 2) month,
+        substr('  ' || max(freedive.day), -2, 2) day,
+        max_duration.duration top_duration,
+        max_depth.depth top_depth
+      from freedive
+      join (
+        -- daily max duration
         select
-            -- row_number() over (order by deep.year, deep.month, deep.day) as row_number,
-            mean.year,
-            mean.month,
-            mean.day,
-            '(' || deep.duration || ') ' || deep.max_depth max_depth,
-            '(' || long.duration || ') ' || long.max_depth max_duration,
-            '(' || mean.duration || ') ' || mean.depth mean
-        from (
-          -- mean
-          select
-              freedive.year,
-              freedive.month,
-              freedive.day,
-              cast( (avg(freedive.duration_secs) / 60) as int)
-                || ':'
-                || substr('0' || cast( (avg(freedive.duration_secs) % 60) as int), -2, 2)
-                duration,
-              round(avg(freedive.max_depth), 1) depth
-          from freedive
-          group by freedive.year, freedive.month, freedive.day
-          order by freedive.year desc, freedive.month  desc, freedive.day desc
-          limit 30
-        ) mean
+            f.year,
+            f.month,
+            f.day,
+            (max(f.duration_secs) / 60) || ':' || substr('0' || (max(f.duration_secs) % 60), -2, 2)
+            || ' (' || substr('    ' || max(f.max_depth), -4, 4) || ')' duration
+        from freedive f
         join (
-            -- deep
-            select
-                freedive.year,
-                freedive.month,
-                freedive.day,
-                freedive.max_depth,
-                (max(freedive.duration_secs) / 60) || ':' || substr('0' || (max(freedive.duration_secs) % 60), -2, 2) duration
+            select year, month, day, max(duration_secs) duration_secs
             from freedive
-            join (
-                select year, month, day, max(max_depth) max_depth
-                from freedive
-                group by year, month, day
-            ) deepdive
-                on freedive.year = deepdive.year
-                and freedive.month = deepdive.month
-                and freedive.day = deepdive.day
-                and freedive.max_depth = deepdive.max_depth
-            group by freedive.year, freedive.month, freedive.day, freedive.max_depth
-        ) deep on deep.year = mean.year and deep.month = mean.month and deep.day = mean.day
+            group by year, month, day
+        ) top
+            on top.year = f.year
+            and top.month = f.month
+            and top.day = f.day
+            and top.duration_secs = f.duration_secs
+        group by f.year, f.month, f.day
+      ) max_duration
+        on max_duration.year = freedive.year
+        and max_duration.month = freedive.month
+        and max_duration.day = freedive.day
+      join (
+        -- daily max depth
+        select
+            f.year,
+            f.month,
+            f.day,
+            '(' || (max(f.duration_secs) / 60) || ':' || substr('0' || (max(f.duration_secs) % 60), -2, 2) || ') '
+            || substr('    ' || max(f.max_depth), -4, 4) depth
+        from freedive f
         join (
-            -- long
-            select
-                freedive.year,
-                freedive.month,
-                freedive.day,
-                max(freedive.max_depth) max_depth,
-                (freedive.duration_secs / 60) || ':' || substr('0' || (freedive.duration_secs % 60), -2, 2) duration
+            select year, month, day, max(max_depth) max_depth
             from freedive
-            join (select year, month, day, max(duration_secs) max_duration
-                from freedive
-                group by year, month, day
-            ) longdive
-                on freedive.year = longdive.year
-                and freedive.month = longdive.month
-                and freedive.day = longdive.day
-                and freedive.duration_secs = longdive.max_duration
-            group by freedive.year, freedive.month, freedive.day, freedive.duration_secs
-        ) long on long.year = mean.year and long.month = mean.month and long.day = mean.day
-        order by deep.year desc, deep.month  desc, deep.day desc
-    ) report
+            group by year, month, day
+        ) top
+            on top.year = f.year
+            and top.month = f.month
+            and top.day = f.day
+            and top.max_depth = f.max_depth
+        group by f.year, f.month, f.day
+      ) max_depth
+        on max_depth.year = freedive.year
+        and max_depth.month = freedive.month
+        and max_depth.day = freedive.day
+      where freedive.year >= 2023
+      group by freedive.year, freedive.month, freedive.day
+      order by freedive.year desc, freedive.month desc, freedive.day desc
+      limit 30
+    ) freediveday
     order by year, month, day
     " | sqlite3 "$db_file_name"
     echo
