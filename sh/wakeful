@@ -7,7 +7,11 @@ NAME
   wakeful - do not leet you laptop to sleep
 
 USAGE
-  wakeful
+  wakeful [interval]
+
+ARGS
+  interval
+    interval time in seconds to wake up (move) the mouse (default 120 seconds)
 
 REQUIRES
   xdotool (sudo apt install xdotool)
@@ -19,13 +23,25 @@ then
     exit
 fi
 
+interval=120
+is_integer='^[0-9]+$'
+
+if [[ ! -z $1 ]] ; then
+  if [[ "$1" =~ $is_integer ]] ; then # if arg is number
+    interval=$1
+  else
+    echo "$HELP"
+    exit 0
+  fi
+fi
+
 # if [ "$(type -t banner)" == "file" ]
 if command -v banner &> /dev/null
 then
     banner wakeful
 fi
 
-echo "started at $(date)"
+echo "started at $(date) (interval $interval seconds)"
 
 mouse_x=0
 mouse_y=0
@@ -73,6 +89,6 @@ awaken () {
 }
 
 while true; do
-  sleep 120
+  sleep $interval
   awaken
 done
