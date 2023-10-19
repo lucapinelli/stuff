@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+if [ -z $SNIPPETS_HOME ]; then
+  SNIPPETS_HOME=~/projects/my/snippets
+else
+  SNIPPETS_HOME=$(echo $SNIPPETS_HOME | sd '^~' "$HOME")
+fi
+
+if [ -z $IDE ]; then
+  IDE=pulsar
+fi
+
+if [ -z $TUI_EDITOR ]; then
+  TUI_EDITOR=hx
+fi
+
 HELP='
 
 USAGE:
@@ -27,10 +41,10 @@ ACTIONS:
 
   a, all
     opens all the snippets with a name that matches the pattern in the
-    Lapce editor
+    Pulsar editor
 
   o, open
-    opens the root folder of the snippets using the Lapce editor
+    opens the root folder of the snippets using the Pulsar editor
 
   h, help
     shows this help
@@ -46,7 +60,7 @@ EXAMPLES:
   # Show all the snippets that contains "move to"
   snippets show "move to"
 
-  # Edit (using vi) the first snippet that is a json (.json) and with a name
+  # Edit (using helix) the first snippet that is a json (.json) and with a name
   # that contains "message"
   snippets edit -e json "message"
 
@@ -61,28 +75,20 @@ DEPENDENCIES:
   fd - https://github.com/sharkdp/fd
   rg - https://github.com/BurntSushi/ripgrep
   hx - https://github.com/helix-editor/helix
-  lapce - https://github.com/lapce/lapce
+  pulsar - https://github.com/pulsar-edit/pulsar
   xclip - sudo apt install xclip
   bat - https://github.com/rivy/rust.bat
 
-  The root folder that contains all the snippets must be located at ~/snippets.
-  To change the root folder path set the environment variable SNIPPETS_HOME.
+  The root folder that contains all the snippets must be located at
+  ~/projects/my/snippets, to change the path of the root folder set the
+  environment variable SNIPPETS_HOME.
+
+  The default IDE is pulsar, to change it set the environment variable IDE.
+
+  The default terminal text editor is hx (Helix), to change it set the
+  environment variable TUI_EDITOR.
 
 '
-
-if [ -z $SNIPPETS_HOME ]; then
-  SNIPPETS_HOME=~/projects/my/snippets
-else
-  SNIPPETS_HOME=$(echo $SNIPPETS_HOME | sd '^~' "$HOME")
-fi
-
-if [ -z $SNIPPETS_IDE ]; then
-  SNIPPETS_IDE=lapce
-fi
-
-if [ -z $SNIPPETS_EDITOR ]; then
-  SNIPPETS_EDITOR=hx
-fi
 
 case "$1" in
   "find" | "fd")
@@ -100,13 +106,13 @@ case "$1" in
     bat "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "edit" | "e")
-    "$SNIPPETS_EDITOR" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    "$TUI_EDITOR" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "all" | "a")
-    "$SNIPPETS_IDE" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+    "$IDE" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "open" | "o")
-    "$SNIPPETS_IDE" "$SNIPPETS_HOME"
+    "$IDE" "$SNIPPETS_HOME"
   ;;
   *)
     echo -e "$HELP"
