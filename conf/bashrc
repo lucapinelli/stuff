@@ -84,7 +84,7 @@ function which_package {
 }
 
 function doc {
-  mkdir -p /tmp/alldoc 
+  mkdir -p /tmp/alldoc
   if [ ! -f /tmp/alldoc/$1.txt ]; then
     banner cht.sh | sd '╋' '┼' | ansi2txt > /tmp/alldoc/$1.txt
     cht.sh $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
@@ -93,18 +93,21 @@ function doc {
     banner man | sd '╋' '┼' | ansi2txt >> /tmp/alldoc/$1.txt
     man $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
   fi
-  gedit /tmp/alldoc/$1.txt  
+  mousepad /tmp/alldoc/$1.txt &
 }
 
-NOTES_PATH="~/projects/my/notes"
-STUFF_PATH="~/projects/my/stuff"
-ZIMNOTE_PATH="~/projects/my/zimnote"
+NOTES_PATH="${HOME}/projects/my/notes"
+STUFF_PATH="${HOME}/projects/my/stuff"
+ZIMNOTE_PATH="${HOME}/projects/my/zimnote"
 function everywhere {
   snippets ${@:1:$#-1} "${@: -1}"
   SNIPPETS_HOME="$NOTES_PATH" snippets ${@:1:$#-1} "${@: -1}"
   SNIPPETS_HOME="$STUFF_PATH" snippets ${@:1:$#-1} "${@: -1}"
   SNIPPETS_HOME="$ZIMNOTE_PATH" snippets ${@:1:$#-1} "${@: -1}"
 }
+alias stuff="SNIPPETS_HOME="${STUFF_PATH}" snippets"
+alias notes="SNIPPETS_HOME="${NOTES_PATH}" snippets"
+alias zimnote="SNIPPETS_HOME="${ZIMNOTE_PATH}" snippets"
 
 function dict {
   curl "https://api.dictionaryapi.dev/api/v2/entries/en/$1" \
@@ -218,7 +221,7 @@ alias watch_modify="inotifywait -qq --event modify --recursive --exclude 'node_m
 alias clip='xclip -selection c -i' # copy the content of the file or of the piped input in the clipboard
 alias clip_cat='xclip -selection c -o' # cat the clipboard
 alias clip_save='xclip -selection c -o >' # copy the content of the clipboard in a file
-alias clip_jq='j="$(xclip -selection c -o)" && echo "$j" | bat -l json --style=grid,numbers && echo "$j" | jq'
+alias clip_jq='j="$(xclip -selection c -o)" && echo "$j" | bat -l json --style=grid,numbers --paging never && echo "$j" | jq'
 #alias bottom='show_alias bottom; xfce4-terminal --title=bottom --geometry=128x48+100+100 --command "btm --mem_as_value -g" &'
 alias bottom='show_alias bottom; gnome-terminal --title=bottom --geometry=128x48+100+100 -- btm --mem_as_value -g'
 alias jsonkv="jq -r '
@@ -234,14 +237,12 @@ alias youtube-mp3='show_alias youtube-mp3; youtube-dl --extract-audio --audio-fo
 alias yt-mp3='show_alias yt-mp3; yt-dlp --extract-audio --audio-format mp3'
 alias render_html='lynx --stdin -dump -width 160'
 alias weather='show_alias weather; curl wttr.in'
+alias mocp='mocp -T dark'
+alias mp='mousepad'
 
 alias db='psql -U postgres -h localhost -p 5432 mydb' # cspell:disable-line
 alias db_clip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\""'
 alias dbx_clip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -xc "$sql" | cat && history -s "db -xc \"${sql}\""'
-
-alias stuff="SNIPPETS_HOME=~/projects/my/stuff snippets"
-alias notes="SNIPPETS_HOME=~/projects/my/notes snippets"
-alias zimnote="SNIPPETS_HOME=~/projects/my/zimnote snippets"
 
 alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -framerate 8 -f x11grab -i :0+0:0 -video_size 1920x1080'
 alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'
@@ -257,6 +258,15 @@ google-chrome \
 
 ### PATH
 export PATH="$PATH:/opt/bin:$STUFF_PATH/sh:$STUFF_PATH/zx:$STUFF_PATH/nodejs"
+
+  ######################################################################
+  # WARNING!                                                           #
+  ######################################################################
+  # Do not use ~ in the PATH variable.                                 #
+  # Paths that uses ~ are not recognized by not script programs        #
+  # so the executables in these paths are not discovered by them       #
+  # (e.g. using `whereis` or `find ... -exec ...` or `fd ... -x ...` ) #
+  ######################################################################
 
 ################
 # luca is gone #
