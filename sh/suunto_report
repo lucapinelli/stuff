@@ -335,7 +335,7 @@ report () {
       group by freedive.year, freedive.month, freedive.day
       order by freedive.year desc, freedive.month desc, freedive.day desc
       limit 30
-    ) freediveday
+    ) freedive_day
     order by year, month, day
     " | sqlite3 "$db_file_name"
     echo
