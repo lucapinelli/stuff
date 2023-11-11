@@ -341,6 +341,7 @@ report () {
     echo
 }
 
-report > report.txt
+report_file_name="$(echo "$pdf_name" | sd '\.pdf$' '_report.txt')"
+report > "$report_file_name"
 
-cat report.txt
+cat "$report_file_name"

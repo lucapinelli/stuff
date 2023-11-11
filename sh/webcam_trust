@@ -24,18 +24,18 @@ configure_webcam () {
 
   if [ "$1" = "bw" ]; then
     set -x # print each command before executing it
-    v4l2-ctl -d /dev/video2 -c saturation=1 # BW
+    v4l2-ctl -d /dev/video0 -c saturation=1 # BW
   else
     set -x # print each command before executing it
-    v4l2-ctl -d /dev/video2 -c saturation=32 # color
+    v4l2-ctl -d /dev/video0 -c saturation=48 # color
   fi
 
-  v4l2-ctl -d /dev/video2 -c brightness=32
-  v4l2-ctl -d /dev/video2 -c contrast=0
-  v4l2-ctl -d /dev/video2 -c hue=0
-  v4l2-ctl -d /dev/video2 -c gain=0
-  v4l2-ctl -d /dev/video2 -c sharpness=0
-  v4l2-ctl -d /dev/video2 -c backlight_compensation=0
+  v4l2-ctl -d /dev/video0 -c brightness=48
+  v4l2-ctl -d /dev/video0 -c contrast=0
+  v4l2-ctl -d /dev/video0 -c hue=0
+  v4l2-ctl -d /dev/video0 -c gain=0
+  v4l2-ctl -d /dev/video0 -c sharpness=0
+  v4l2-ctl -d /dev/video0 -c backlight_compensation=0
 }
 
 
