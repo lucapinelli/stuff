@@ -218,56 +218,39 @@ report () {
     " | sqlite3 "$db_file_name"
 
     echo "
-    ╭────────────────╮
-    │ Monthly Report │
-    ╰────────────────╯
+    ╭──────────────────────────────╮
+    │ Monthly Report Best Duration │
+    ╰──────────────────────────────╯
     "
     echo ".mode columns
-    select
-      substr('  ' || max(freedive.month), -2, 2) month,
-      substr('  ' || max(freedive.day), -2, 2) day,
-      max_duration.duration top_duration,
-      max_depth.depth top_depth
+    select year, month, max(duration) duration
     from freedive
-    join (
-      -- monthly max duration
-      select
-          f.year,
-          f.month,
-          (max(f.duration_secs) / 60) || ':' || substr('0' || (max(f.duration_secs) % 60), -2, 2)
-          || ' (' || substr('    ' || max(f.max_depth), -4, 4) || ')' duration
-      from freedive f
-      join (
-          select year, month, max(duration_secs) duration_secs
-          from freedive
-          group by year, month
-      ) top
-          on top.year = f.year
-          and top.month = f.month
-          and top.duration_secs = f.duration_secs
-      group by f.year, f.month
-    ) max_duration on max_duration.year = freedive.year and max_duration.month = freedive.month
-    join (
-      -- monthly max depth
-      select
-          f.year,
-          f.month,
-          '(' || (max(f.duration_secs) / 60) || ':' || substr('0' || (max(f.duration_secs) % 60), -2, 2) || ') '
-          || substr('    ' || max(f.max_depth), -4, 4) depth
-      from freedive f
-      join (
-          select year, month, max(max_depth) max_depth
-          from freedive
-          group by year, month
-      ) top
-          on top.year = f.year
-          and top.month = f.month
-          and top.max_depth = f.max_depth
-      group by f.year, f.month
-    ) max_depth on max_depth.year = freedive.year and max_depth.month = freedive.month
-    where freedive.year >= 2023
-    group by freedive.year, freedive.month
-    order by freedive.year, freedive.month
+    group by year, month
+    order by max(duration) desc
+    " | sqlite3 "$db_file_name"
+
+    echo "
+    ╭───────────────────────────╮
+    │ Monthly Report Best Depth │
+    ╰───────────────────────────╯
+    "
+    echo ".mode columns
+    select year, month, max(max_depth) max_depth
+    from freedive
+    group by year, month
+    order by max(max_depth) desc
+    " | sqlite3 "$db_file_name"
+
+    echo "
+    ╭────────────────────────────────╮
+    │ Monthly Report Best Mean Depth │
+    ╰────────────────────────────────╯
+    "
+    echo ".mode columns
+    select year, month, max(avg_depth) avg_depth
+    from freedive
+    group by year, month
+    order by max(avg_depth) desc
     " | sqlite3 "$db_file_name"
 
     echo "
@@ -282,8 +265,8 @@ report () {
         freedive.year,
         substr('  ' || max(freedive.month), -2, 2) month,
         substr('  ' || max(freedive.day), -2, 2) day,
-        max_duration.duration top_duration,
-        max_depth.depth top_depth
+        max_depth.depth top_depth,
+        max_duration.duration top_duration
       from freedive
       join (
         -- daily max duration

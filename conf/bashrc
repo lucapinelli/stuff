@@ -83,6 +83,10 @@ function which_package {
   dpkg -S $(which $1)
 }
 
+if [ -z $EDITOR ]; then
+  EDITOR=pulsar
+fi
+
 function doc {
   mkdir -p /tmp/alldoc
   if [ ! -f /tmp/alldoc/$1.txt ]; then
@@ -93,7 +97,7 @@ function doc {
     banner man | sd '╋' '┼' | ansi2txt >> /tmp/alldoc/$1.txt
     man $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
   fi
-  mousepad /tmp/alldoc/$1.txt &
+  $EDITOR /tmp/alldoc/$1.txt &
 }
 
 NOTES_PATH="${HOME}/projects/my/notes"
@@ -207,7 +211,7 @@ alias ll='show_alias ll; ls -ohN --group-directories-first'
 alias lla='show_alias lla; ls -ohNa --group-directories-first'
 # // cspell:disable-next
 alias commands='show_alias commands; compgen -abckA function | sort -u'
-alias bp='bat --plain --paging never'
+alias bp='bat -pp'
 alias trash_list='show_alias trash_list; ls -1 /home/$USER/.local/share/Trash/files'
 alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
 alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
@@ -239,10 +243,17 @@ alias render_html='lynx --stdin -dump -width 160'
 alias weather='show_alias weather; curl wttr.in'
 alias mocp='mocp -T dark'
 alias mp='mousepad'
+alias code='codium-insiders'
 
 alias db='psql -U postgres -h localhost -p 5432 mydb' # cspell:disable-line
-alias db_clip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\""'
-alias dbx_clip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -xc "$sql" | cat && history -s "db -xc \"${sql}\""'
+alias dbclip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\" | cat"'
+alias dbxclip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -xc "$sql" | cat && history -s "db -xc \"${sql}\" | cat"'
+alias dbhistory='history | awk '"'"'
+{ if ($1 ~ /[0-9]+/ && $2 == "db") db_cmd = "true" }
+{ if ($1 ~ /[0-9]+/ && $2 != "db") db_cmd = "false" }
+{ if (db_cmd == "true") print $0 }
+'"'"' '
+alias dbsearch='dbhistory | rg'
 
 alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -framerate 8 -f x11grab -i :0+0:0 -video_size 1920x1080'
 alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'

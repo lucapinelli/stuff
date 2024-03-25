@@ -19,25 +19,43 @@ USAGE EXAMPLES
   webcam_laptop help
 "
 
+webcam="/dev/video0"
+
+# User Controls
+#
+#                      brightness 0x00980900 (int)    : min=0 max=100 step=1 default=50 value=32
+#                        contrast 0x00980901 (int)    : min=0 max=100 step=1 default=32 value=32
+#                      saturation 0x00980902 (int)    : min=0 max=100 step=1 default=32 value=32
+#                             hue 0x00980903 (int)    : min=-180 max=180 step=1 default=0 value=0
+#         white_balance_automatic 0x0098090c (bool)   : default=1 value=1
+#                           gamma 0x00980910 (int)    : min=1 max=16 step=1 default=8 value=8
+#            power_line_frequency 0x00980918 (menu)   : min=0 max=2 default=2 value=1 (50 Hz)
+#       white_balance_temperature 0x0098091a (int)    : min=2800 max=6500 step=1 default=5000 value=5000 flags=inactive
+#                       sharpness 0x0098091b (int)    : min=0 max=18 step=1 default=4 value=0
+#
+# Camera Controls
+#
+#      exposure_dynamic_framerate 0x009a0903 (bool)   : default=0 value=1
+
+
 configure_webcam () {
-  v4l2-ctl -d /dev/video0 -l
+  v4l2-ctl -d $webcam -l
 
   if [ "$1" = "bw" ]; then
     set -x # print each command before executing it
-    v4l2-ctl -d /dev/video0 -c saturation=0 # BW
+    v4l2-ctl -d $webcam -c saturation=0 # BW
   else
     set -x # print each command before executing it
-    v4l2-ctl -d /dev/video0 -c saturation=64 # color
+    v4l2-ctl -d $webcam -c saturation=32 # color
   fi
 
-  v4l2-ctl -d /dev/video0 -c brightness=32
-  v4l2-ctl -d /dev/video0 -c contrast=32
-  v4l2-ctl -d /dev/video0 -c hue=0
-  v4l2-ctl -d /dev/video0 -c gain=0
-  v4l2-ctl -d /dev/video0 -c sharpness=0
-  v4l2-ctl -d /dev/video0 -c backlight_compensation=0
+  v4l2-ctl -d $webcam -c brightness=32
+  v4l2-ctl -d $webcam -c contrast=32
+  v4l2-ctl -d $webcam -c hue=0
+  # v4l2-ctl -d $webcam -c gain=0
+  v4l2-ctl -d $webcam -c sharpness=0
+  # v4l2-ctl -d $webcam -c backlight_compensation=0
 }
-
 
 case "$1" in
   ""|"bw") configure_webcam "$1" ;;

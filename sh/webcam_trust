@@ -11,35 +11,59 @@ USAGE
 
 OPTION
   bw               Sets the webcam in black and white (saturation 100%)
+  vc               Sets the webcam in "'"'"very colorful"'"'" mode
   help,--help,-h   Shows this help
 
 USAGE EXAMPLES
-  webcam_trust
-  webcam_trust bw
+  webcam_trust # "'"'"normal color"'"'" mode
+  webcam_trust bw # "'"'"black & white"'"'" mode
+  webcam_trust vc # "'"'"very colorful"'"'" mode
   webcam_trust help
 "
 
+webcam="/dev/video2"
+
+# User Controls
+#
+#                   brightness 0x00980900 (int)  : min=-64 max=64 step=1 default=13
+#                     contrast 0x00980901 (int)  : min=0 max=64 step=1 default=25
+#                   saturation 0x00980902 (int)  : min=1 max=128 step=1 default=44
+#                          hue 0x00980903 (int)  : min=-40 max=40 step=1 default=6
+#                        gamma 0x00980910 (int)  : min=72 max=500 step=1 default=145
+#                         gain 0x00980913 (int)  : min=0 max=100 step=1 default=0
+#         power_line_frequency 0x00980918 (menu) : min=0 max=2 default=1 value=1 (50 Hz)
+#                    sharpness 0x0098091b (int)  : min=0 max=140 step=1 default=30
+#       backlight_compensation 0x0098091c (int)  : min=0 max=2 step=1 default=1
+#
+# Camera Controls
+#
+#   exposure_dynamic_framerate 0x009a0903 (bool) : default=0
+
+
 configure_webcam () {
-  v4l2-ctl -d /dev/video2 -l
+  v4l2-ctl -d $webcam -l
 
   if [ "$1" = "bw" ]; then
     set -x # print each command before executing it
-    v4l2-ctl -d /dev/video0 -c saturation=1 # BW
+    v4l2-ctl -d $webcam -c saturation=1 # BW
+  elif [ "$1" = "vc" ]; then
+    set -x # print each command before executing it
+    v4l2-ctl -d $webcam -c saturation=64 # very colorful
   else
     set -x # print each command before executing it
-    v4l2-ctl -d /dev/video0 -c saturation=48 # color
+    v4l2-ctl -d $webcam -c saturation=32 # color
   fi
 
-  v4l2-ctl -d /dev/video0 -c brightness=48
-  v4l2-ctl -d /dev/video0 -c contrast=0
-  v4l2-ctl -d /dev/video0 -c hue=0
-  v4l2-ctl -d /dev/video0 -c gain=0
-  v4l2-ctl -d /dev/video0 -c sharpness=0
-  v4l2-ctl -d /dev/video0 -c backlight_compensation=0
+  v4l2-ctl -d $webcam -c brightness=32
+  v4l2-ctl -d $webcam -c contrast=0
+  v4l2-ctl -d $webcam -c hue=0
+  v4l2-ctl -d $webcam -c gain=0
+  v4l2-ctl -d $webcam -c sharpness=0
+  v4l2-ctl -d $webcam -c backlight_compensation=0
 }
 
 
 case "$1" in
-  ""|"bw") configure_webcam "$1" ;;
+  ""|"bw"|"vc") configure_webcam "$1" ;;
   *) echo "$help" ;;
 esac
