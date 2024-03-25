@@ -86,22 +86,23 @@ report () {
     "
 
     echo ".mode columns
+    -- Dayly Report: Top ApneaTime
     select DiveDate, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
     from FreeDive
     join (
       select min(DiveId) id
       from FreeDive
       join (
-        select date(DiveDate) Date, max(Duration) Max
+        select strftime('%Y-%m-%d', date(DiveDate)) Day, max(Duration) Max
         from FreeDive
-        group by date(DiveDate) -- group by day
+        group by strftime('%Y-%m-%d', date(DiveDate)) -- group by Day
         order by max(Duration) desc
-      ) Top on Top.Date = date(DiveDate) and Top.Max = Duration
-      group by Duration
+      ) Top on Top.Day = strftime('%Y-%m-%d', date(DiveDate)) and Top.Max = Duration
+      group by strftime('%Y-%m-%d', date(DiveDate))
       order by Duration desc
       limit 10
     ) TopRef where TopRef.id = DiveId
-    order by Duration desc
+    order by Duration desc, DiveDate
     " | sqlite3 "$db_file_name"
 
     echo "
@@ -118,15 +119,16 @@ report () {
       select min(DiveId) id
       from FreeDive
       join (
-        select date(DiveDate) Date, max(MaxDepth) Max
+        select strftime('%Y-%m-%d', date(DiveDate)) Day, max(MaxDepth) Max
         from FreeDive
-        group by date(DiveDate) -- group by day
-      ) Top on Top.Date = date(DiveDate) and Top.Max = MaxDepth
-      group by MaxDepth
+        group by strftime('%Y-%m-%d', date(DiveDate)) -- group by Day
+        order by max(MaxDepth) desc
+      ) Top on Top.Day = strftime('%Y-%m-%d', date(DiveDate)) and Top.Max = MaxDepth
+      group by strftime('%Y-%m-%d', date(DiveDate))
       order by MaxDepth desc
       limit 10
     ) TopRef where TopRef.id = DiveId
-    order by MaxDepth desc
+    order by MaxDepth desc, DiveDate
     " | sqlite3 "$db_file_name"
 
     echo "
@@ -143,15 +145,16 @@ report () {
       select min(DiveId) id
       from FreeDive
       join (
-        select date(DiveDate) Date, max(AvgDepth) Max
+        select strftime('%Y-%m-%d', date(DiveDate)) Day, max(AvgDepth) Max
         from FreeDive
-        group by date(DiveDate) -- group by day
-      ) Top on Top.Date = date(DiveDate) and Top.Max = AvgDepth
-      group by AvgDepth
+        group by strftime('%Y-%m-%d', date(DiveDate)) -- group by Day
+        order by max(AvgDepth) desc
+      ) Top on Top.Day = strftime('%Y-%m-%d', date(DiveDate)) and Top.Max = AvgDepth
+      group by strftime('%Y-%m-%d', date(DiveDate))
       order by AvgDepth desc
       limit 10
     ) TopRef where TopRef.id = DiveId
-    order by AvgDepth desc
+    order by AvgDepth desc, DiveDate
     " | sqlite3 "$db_file_name"
 
     echo "
