@@ -90,19 +90,25 @@ fi
 function doc {
   mkdir -p /tmp/alldoc
   if [ ! -f /tmp/alldoc/$1.txt ]; then
+    echo "generating the doc for $1 ..."
+    echo "  - cht.sh"
     banner cht.sh | sd '╋' '┼' | ansi2txt > /tmp/alldoc/$1.txt
     cht.sh $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    echo "  - --help"
     banner help | sd '╋' '┼' | ansi2txt >> /tmp/alldoc/$1.txt
     $1 --help 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    echo "  - man"
     banner man | sd '╋' '┼' | ansi2txt >> /tmp/alldoc/$1.txt
     man $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
+    echo "done :)"
   fi
   $EDITOR /tmp/alldoc/$1.txt &
 }
 
-NOTES_PATH="${HOME}/projects/my/notes"
-STUFF_PATH="${HOME}/projects/my/stuff"
-ZIMNOTE_PATH="${HOME}/projects/my/zimnote"
+export SNIPPETS_HOME="${HOME}/code/luca.pinelli/snippets"
+export NOTES_PATH="/baita/code/my/notes"
+export STUFF_PATH="/baita/code/my/stuff"
+export ZIMNOTE_PATH="/baita/code/my/zimnote"
 function everywhere {
   snippets ${@:1:$#-1} "${@: -1}"
   SNIPPETS_HOME="$NOTES_PATH" snippets ${@:1:$#-1} "${@: -1}"
@@ -237,13 +243,13 @@ alias xt='show_alias xt; xterm -fa monaco -fs 10 -fg rgb:BB/90/90 -bg rgb:3B/10/
 alias saysomething='show_alias saysomething; fortune | cowsay -f `ls /usr/share/cowsay/cows/ | shuf -n 1`'
 alias speak='show_alias speak; espeak -g 4 -s 110'
 alias xopen='show_alias xopen; xdg-open'
-alias youtube-mp3='show_alias youtube-mp3; youtube-dl --extract-audio --audio-format mp3'
 alias yt-mp3='show_alias yt-mp3; yt-dlp --extract-audio --audio-format mp3'
 alias render_html='lynx --stdin -dump -width 160'
 alias weather='show_alias weather; curl wttr.in'
 alias mocp='mocp -T dark'
 alias mp='mousepad'
 alias code='codium-insiders'
+alias search='show_alias search; banner search && rg --sort=path'
 
 alias db='psql -U postgres -h localhost -p 5432 mydb' # cspell:disable-line
 alias dbclip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\" | cat"'

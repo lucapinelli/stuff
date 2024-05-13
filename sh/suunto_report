@@ -164,20 +164,20 @@ report () {
     "
 
     echo ".mode columns
-    select strftime('%Y-%m', date(DiveDate)) DiveMonth, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
+    select TopRef.Month, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
     from FreeDive
     join (
-      select min(DiveId) id
-      from FreeDive
-      join (
-        select strftime('%Y-%m', date(DiveDate)) Month, max(Duration) Max
-        from FreeDive
-        group by strftime('%Y-%m', date(DiveDate)) -- group by month
-        order by max(Duration) desc
-      ) Top on Top.Month = strftime('%Y-%m', date(DiveDate)) and Top.Max = Duration
-      group by Duration
-      order by Duration desc
-    ) TopRef where TopRef.id = DiveId
+    	select min(Dive.DiveId) DiveId, TopTime.Month
+    	from (
+    		select strftime('%Y-%m', date(DiveDate)) Month, max(Duration) Max
+    		from FreeDive
+    		group by strftime('%Y-%m', date(DiveDate)) -- group by month
+    	) TopTime
+    	join FreeDive Dive on
+    		strftime('%Y-%m', date(Dive.DiveDate)) = TopTime.Month
+    		and Dive.Duration = TopTime.Max
+    	group by TopTime.Month
+    ) TopRef on TopRef.DiveId = FreeDive.DiveId
     order by Duration desc
     " | sqlite3 "$db_file_name"
 
@@ -188,20 +188,20 @@ report () {
     "
 
     echo ".mode columns
-    select strftime('%Y-%m', date(DiveDate)) DiveMonth, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
+    select TopRef.Month, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
     from FreeDive
     join (
-      select min(DiveId) id
-      from FreeDive
-      join (
+    	select min(Dive.DiveId) DiveId, TopDepth.Month
+    	from (
         select strftime('%Y-%m', date(DiveDate)) Month, max(MaxDepth) Max
         from FreeDive
         group by strftime('%Y-%m', date(DiveDate)) -- group by month
-        order by max(MaxDepth) desc
-      ) Top on Top.Month = strftime('%Y-%m', date(DiveDate)) and Top.Max = MaxDepth
-      group by MaxDepth
-      order by MaxDepth desc
-    ) TopRef where TopRef.id = DiveId
+    	) TopDepth
+    	join FreeDive Dive on
+    		strftime('%Y-%m', date(Dive.DiveDate)) = TopDepth.Month
+    		and Dive.MaxDepth = TopDepth.Max
+    	group by TopDepth.Month
+    ) TopRef on TopRef.DiveId = FreeDive.DiveId
     order by MaxDepth desc
     " | sqlite3 "$db_file_name"
 
@@ -212,20 +212,20 @@ report () {
     "
 
     echo ".mode columns
-    select strftime('%Y-%m', date(DiveDate)) DiveMonth, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
+    select TopRef.Month, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
     from FreeDive
     join (
-      select min(DiveId) id
-      from FreeDive
-      join (
+    	select min(Dive.DiveId) DiveId, TopAvgDepth.Month
+    	from (
         select strftime('%Y-%m', date(DiveDate)) Month, max(AvgDepth) Max
         from FreeDive
         group by strftime('%Y-%m', date(DiveDate)) -- group by month
-        order by max(AvgDepth) desc
-      ) Top on Top.Month = strftime('%Y-%m', date(DiveDate)) and Top.Max = AvgDepth
-      group by AvgDepth
-      order by AvgDepth desc
-    ) TopRef where TopRef.id = DiveId
+    	) TopAvgDepth
+    	join FreeDive Dive on
+    		strftime('%Y-%m', date(Dive.DiveDate)) = TopAvgDepth.Month
+    		and Dive.AvgDepth = TopAvgDepth.Max
+    	group by TopAvgDepth.Month
+    ) TopRef on TopRef.DiveId = FreeDive.DiveId
     order by AvgDepth desc
     " | sqlite3 "$db_file_name"
 
