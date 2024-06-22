@@ -58,6 +58,9 @@ create view FreeDive
 as
 select
   DiveId,
+  cast(strftime('%Y', date(datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch'))) as int) Year,
+  cast(strftime('%m', date(datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch'))) as int) Month,
+  cast(strftime('%d', date(datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch'))) as int) Day,
   datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch') DiveDate,
   Duration,
   (Duration / 60) || ':' || substr('0' || (Duration % 60), -2, 2) as ApneaTime,
@@ -72,9 +75,11 @@ echo "$create_view" | bat --plain -l sql
 sqlite3 "$db_file_name" "$create_view"
 
 echo "
-╭──────────────────╮
-│ FREEDIVE REPORTS │
-╰──────────────────╯
+    ╭─────────────────────╮
+    │ ╭─────────────────╮ │
+    │ │ FREEDIVE REPORT │ │
+    │ ╰─────────────────╯ │
+    ╰─────────────────────╯
 "
 
 report () {
