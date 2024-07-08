@@ -1,6 +1,6 @@
--- echo && clip_cat && echo && echo ".mode columns
+-- echo && clip_cat | bp -l sql && echo && echo ".mode columns
 -- $(clip_cat)
--- " | sqlite3 DM420240324.db
+-- " | sqlite3 DM*.db
 
 -- FreeDive VIEW
 -- drop view FreeDive;
@@ -11,6 +11,7 @@ select
   cast(strftime('%Y', date(datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch'))) as int) Year,
   cast(strftime('%m', date(datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch'))) as int) Month,
   cast(strftime('%d', date(datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch'))) as int) Day,
+  cast(strftime('%W', date(datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch'))) as int) Week,
   datetime(((StartTime / 10000000) - (1970 * 365 * 24 * 60 * 60) - (112 * 24 * 60 * 60)), 'unixepoch') DiveDate,
   Duration,
   (Duration / 60) || ':' || substr('0' || (Duration % 60), -2, 2) as ApneaTime,
