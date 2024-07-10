@@ -89,82 +89,36 @@ print_graph () {
   indentation=$3
   values=()
   for value in $rows; do
-    scaled=$(eva "$value / $max * 32" | cut -d. -f1)
+    scaled=$(eva "$value / $max * 48" | cut -d. -f1)
     values+=($scaled)
   done
-  echo -n "$indentation"
-  for i in "${values[@]}"; do
-    i=$(eva "$i-24" | cut -d. -f1)
-    case $i in
-      1) echo -n "▁" ;;
-      2) echo -n "▂" ;;
-      3) echo -n "▃" ;;
-      4) echo -n "▄" ;;
-      5) echo -n "▅" ;;
-      6) echo -n "▆" ;;
-      7) echo -n "▇" ;;
-      8) echo -n "█" ;;
-      *) echo -n " " ;;
-    esac
+
+  for j in 40 32 24 16 8 0; do
+    echo -n "$indentation"
+    for i in "${values[@]}"; do
+      i=$(eva "$i-$j" | cut -d. -f1)
+      if (( i <= 0 )); then
+        echo -n " "
+      else
+        case $i in
+          1) echo -n "▁" ;;
+          2) echo -n "▂" ;;
+          3) echo -n "▃" ;;
+          4) echo -n "▄" ;;
+          5) echo -n "▅" ;;
+          6) echo -n "▆" ;;
+          7) echo -n "▇" ;;
+          *) echo -n "█" ;;
+        esac
+      fi
+    done
+    echo
   done
-  echo
-  echo -n "$indentation"
-  for i in "${values[@]}"; do
-    i=$(eva "$i-16" | cut -d. -f1)
-    if (( i <= 0 )); then
-      echo -n " "
-    else
-      case $i in
-        1) echo -n "▁" ;;
-        2) echo -n "▂" ;;
-        3) echo -n "▃" ;;
-        4) echo -n "▄" ;;
-        5) echo -n "▅" ;;
-        6) echo -n "▆" ;;
-        7) echo -n "▇" ;;
-        *) echo -n "█" ;;
-      esac
-    fi
-  done
-  echo
-  echo -n "$indentation"
-  for i in "${values[@]}"; do
-    i=$(eva "$i-8" | cut -d. -f1)
-    if (( i <= 0 )); then
-      echo -n " "
-    else
-      case $i in
-        1) echo -n "▁" ;;
-        2) echo -n "▂" ;;
-        3) echo -n "▃" ;;
-        4) echo -n "▄" ;;
-        5) echo -n "▅" ;;
-        6) echo -n "▆" ;;
-        7) echo -n "▇" ;;
-        *) echo -n "█" ;;
-      esac
-    fi
-  done
-  echo
+
   echo -n "$indentation"
   for i in "${values[@]}"; do
     case $i in
-      0) echo -n " " ;;
-      1) echo -n "▁" ;;
-      2) echo -n "▂" ;;
-      3) echo -n "▃" ;;
-      4) echo -n "▄" ;;
-      5) echo -n "▅" ;;
-      6) echo -n "▆" ;;
-      7) echo -n "▇" ;;
-      *) echo -n "█" ;;
-    esac
-  done
-  echo
-  echo -n "$indentation"
-  for i in "${values[@]}"; do
-    case $i in
-      32) echo -n "*" ;;
+      48) echo -n "*" ;;
       *) echo -n " " ;;
     esac
   done
@@ -364,9 +318,9 @@ report () {
     print_graph "$rows" "$max" "    "
 
     echo "
-    ╭─────────────────────╮
-    │ Monthly Depth Graph │
-    ╰─────────────────────╯
+    ╭─────────────────────────╮
+    │ Monthly Max Depth Graph │
+    ╰─────────────────────────╯
     "
     rows=`echo ".mode columns
     select max(MaxDepth)
@@ -379,6 +333,24 @@ report () {
     from FreeDive
     " | sqlite3 "$db_file_name" | tail +3`
     print_graph "$rows" "$max" "    "
+
+    echo "
+    ╭─────────────────────────╮
+    │ Monthly Avg Depth Graph │
+    ╰─────────────────────────╯
+    "
+    rows=`echo ".mode columns
+    select max(AvgDepth)
+    from FreeDive
+    group by Year, Month
+    order by Year, Month
+    " | sqlite3 "$db_file_name" | tail +3`
+    max=`echo ".mode columns
+    select max(AvgDepth)
+    from FreeDive
+    " | sqlite3 "$db_file_name" | tail +3`
+    print_graph "$rows" "$max" "    "
+
 }
 
 report > "$report_file_name"
