@@ -351,6 +351,46 @@ report () {
     " | sqlite3 "$db_file_name" | tail +3`
     print_graph "$rows" "$max" "    "
 
+    best=$(
+      echo "
+        select
+          strftime('%Y-%m-%d', date(DiveDate)) DiveDay,
+          ApneaTime,
+          MaxDepth,
+          Temperature
+        from FreeDive
+        order by MaxDepth desc, DiveDate
+        limit 1
+      " | sqlite3 "$db_file_name"
+    )
+
+    echo "
+    ╭───────────────────────────────────╮
+    │ Best Dive Depth $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${3} mt')          │
+    │ $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${1} duration ${2} temp ${4}°') │
+    ╰───────────────────────────────────╯
+    "
+
+    best=$(
+      echo "
+        select
+          strftime('%Y-%m-%d', date(DiveDate)) DiveDay,
+          ApneaTime,
+          MaxDepth,
+          Temperature
+        from FreeDive
+        order by ApneaTime desc, DiveDate
+        limit 1
+      " | sqlite3 "$db_file_name"
+    )
+
+    echo "
+    ╭────────────────────────────────────╮
+    │ Best Dive Time $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${2}')                │
+    │ $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${1} depth ${3} mt temp ${4}°') │
+    ╰────────────────────────────────────╯
+    "
+
 }
 
 report > "$report_file_name"
