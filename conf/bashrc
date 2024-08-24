@@ -218,6 +218,7 @@ alias lla='show_alias lla; ls -ohNa --group-directories-first'
 # // cspell:disable-next
 alias commands='show_alias commands; compgen -abckA function | sort -u'
 alias bp='bat -pp'
+alias trash='gio trash'
 alias trash_list='show_alias trash_list; ls -1 /home/$USER/.local/share/Trash/files'
 alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
 alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
@@ -232,6 +233,18 @@ alias clip='xclip -selection c -i' # copy the content of the file or of the pipe
 alias clip_cat='xclip -selection c -o' # cat the clipboard
 alias clip_save='xclip -selection c -o >' # copy the content of the clipboard in a file
 alias clip_jq='j="$(xclip -selection c -o)" && echo "$j" | bat -l json --style=grid,numbers --paging never && echo "$j" | jq'
+alias clip_extract_uuid='
+xclip -selection c -o \
+ | sd '"'"'.*([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}).*'"'"' '"'"'$1'"'"' \
+ | xclip -selection c \
+ && echo "new clipboard content: $(xclip -selection c -o)"
+'
+alias clip_extract_shortid='
+xclip -selection c -o \
+ | sd '"'"'.*([a-f0-9]{8})-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}.*'"'"' '"'"'$1'"'"' \
+ | xclip -selection c \
+ && echo "new clipboard content: $(xclip -selection c -o)"
+'
 #alias bottom='show_alias bottom; xfce4-terminal --title=bottom --geometry=128x48+100+100 --command "btm --mem_as_value -g" &'
 alias bottom='show_alias bottom; gnome-terminal --title=bottom --geometry=128x48+100+100 -- btm --mem_as_value -g'
 alias jsonkv="jq -r '
@@ -252,14 +265,23 @@ alias code='codium-insiders'
 alias search='show_alias search; banner search && rg --sort=path'
 
 alias db='psql -U postgres -h localhost -p 5432 mydb' # cspell:disable-line
-alias dbclip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -c "$sql" | cat && history -s "db -c \"${sql}\" | cat"'
-alias dbxclip='sql="$(xclip -selection c -o)" && echo "$sql" | bat --style grid --paging never -l sql && db -xc "$sql" | cat && history -s "db -xc \"${sql}\" | cat"'
+alias dbclip='sql="$(xclip -selection c -o)" && \
+echo "$sql" | bat --style grid --paging never -l sql && \
+db -c "$sql" | cat && \
+history -s "db -c \"
+${sql}
+\" | cat"'
+alias dbxclip='sql="$(xclip -selection c -o)" && \
+echo "$sql" | bat --style grid --paging never -l sql && \
+db -xc "$sql" | cat && \
+history -s "db -xc \"
+${sql}
+\" | cat"'
 alias dbhistory='history | awk '"'"'
 { if ($1 ~ /[0-9]+/ && $2 == "db") db_cmd = "true" }
 { if ($1 ~ /[0-9]+/ && $2 != "db") db_cmd = "false" }
 { if (db_cmd == "true") print $0 }
 '"'"' '
-alias dbsearch='dbhistory | rg'
 
 alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -framerate 8 -f x11grab -i :0+0:0 -video_size 1920x1080'
 alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'
