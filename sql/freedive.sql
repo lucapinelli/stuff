@@ -1,3 +1,6 @@
+-- https://www.sqlitetutorial.net/sqlite-functions/
+-- https://www.sqlitetutorial.net/sqlite-math-functions/
+
 -- echo && clip_cat | bp -l sql && echo && echo ".mode columns
 -- $(clip_cat)
 -- " | sqlite3 DM*.db
@@ -21,6 +24,47 @@ select
   DiveNumberInSerie as Serie
 from dive
 where mode = 3 --freedive
+
+-- only dives made on 2024-07-09
+select *
+from freedive
+where DiveDate between '2024-07-09' and '2024-07-10'
+order by DiveDate
+
+-- dive with depth >= 15mt, group by day, sort by avg depth
+select
+  Year,
+  Month,
+  Day,
+  count(*),
+  cast(ceil(avg(Duration)) as integer) avg_time,
+  cast(ceil(avg(MaxDepth)) as integer) avg_depth
+from freedive
+where MaxDepth >= 15
+group by Year, Month, Day
+order by avg(MaxDepth) desc, Year, Month, Day
+
+-- compare years depths
+select
+  Year,
+  count(*),
+  cast(ceil(avg(Duration)) as integer) avg_time,
+  cast(ceil(avg(MaxDepth)) as integer) avg_depth
+from freedive
+where MaxDepth > 15
+group by Year
+order by count(*) desc, Year
+
+-- compare years durations
+select
+  Year,
+  count(*),
+  cast(ceil(avg(Duration)) as integer) avg_time,
+  cast(ceil(avg(MaxDepth)) as integer) avg_depth
+from freedive
+where Duration > 90
+group by Year
+order by count(*) desc, Year
 
 -- compare 12 month ago Duration
 select DiveDate, Duration, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
