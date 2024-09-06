@@ -144,11 +144,10 @@ function wait_get {
 }
 
 function wait_for {
-  echo -n "WAIT FOR $1 ..."
+  echo -n "WAIT FOR: $1 ..."
   count=0
-  eval "$1" &> /dev/null
-  status=$?
-  while [ "$status" != "0" ]
+  status=$(((eval "$1" &> /dev/null) && echo "success" || echo "error")  )
+  while [ "$status" != "success" ]
   do
     count=$((count + 1))
     if (( count > 60 )); then
@@ -157,8 +156,7 @@ function wait_for {
     fi
     sleep 3
     echo -n "."
-    eval "$1" &> /dev/null
-    status=$?
+    status=$(((eval "$1" &> /dev/null) && echo "success" || echo "error")  )
   done
   echo " completed successfully"
 }
