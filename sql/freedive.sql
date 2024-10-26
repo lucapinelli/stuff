@@ -31,62 +31,35 @@ from freedive
 where DiveDate between '2024-07-09' and '2024-07-10'
 order by DiveDate
 
--- dive with depth >= 15mt, group by day, sort by avg depth
-select
-  Year,
-  Month,
-  Day,
-  count(*),
-  cast(ceil(avg(Duration)) as integer) avg_time,
-  cast(ceil(avg(MaxDepth)) as integer) avg_depth
+-- dayly report
+select Year, Month, Day, max(Duration) max_duration, max(MaxDepth) max_depth
 from freedive
-where MaxDepth >= 15
 group by Year, Month, Day
-order by avg(MaxDepth) desc, Year, Month, Day
-
--- compare years depths
-select
-  Year,
-  count(*),
-  cast(ceil(avg(Duration)) as integer) avg_time,
-  cast(ceil(avg(MaxDepth)) as integer) avg_depth
-from freedive
-where MaxDepth > 15
-group by Year
-order by count(*) desc, Year
-
--- compare years durations
-select
-  Year,
-  count(*),
-  cast(ceil(avg(Duration)) as integer) avg_time,
-  cast(ceil(avg(MaxDepth)) as integer) avg_depth
-from freedive
-where Duration > 90
-group by Year
-order by count(*) desc, Year
+having max(Duration) > 100
+  or max(MaxDepth) > 13
+order by Year, Month, Day
 
 -- compare 12 month ago Duration
 select DiveDate, Duration, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
 from freedive
-where (Year <= 2023 and Month <= 06)
-  or (Year = 2024 and Month = 06)
+where (Year < strftime('%Y', date('now')) and Month <= strftime('%m', date('now')))
+  or (Year = strftime('%Y', date('now')) and Month = strftime('%m', date('now')))
 order by Duration desc, DiveDate
 limit 10
 
 -- compare 12 month ago MaxDepth
 select DiveDate, Duration, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
 from freedive
-where (Year <= 2023 and Month <= 06)
-  or (Year = 2024 and Month = 06)
+where (Year < strftime('%Y', date('now')) and Month <= strftime('%m', date('now')))
+  or (Year = strftime('%Y', date('now')) and Month = strftime('%m', date('now')))
 order by MaxDepth desc, DiveDate
 limit 10
 
 -- compare 12 month ago AvgDepth
 select DiveDate, Duration, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
 from freedive
-where (Year <= 2023 and Month <= 06)
-  or (Year = 2024 and Month = 06)
+where (Year < strftime('%Y', date('now')) and Month <= strftime('%m', date('now')))
+  or (Year = strftime('%Y', date('now')) and Month = strftime('%m', date('now')))
 order by AvgDepth desc, DiveDate
 limit 10
 
@@ -95,9 +68,9 @@ select *
 from (
 	select
 		strftime('%m', date(DiveDate)) Month,
-		min(Temperature) MinTemperature,
-		round(avg(Temperature), 0) AvgTemperature,
-		max(Temperature) MaxTemperature
+		min(Temperature) MinTemp,
+		cast(ceil(avg(Temperature)) as int) AvgTemp,
+		max(Temperature) MaxTemp
 	from FreeDive
 	where Serie > 3
 	group by strftime('%m', date(DiveDate)) -- Month
