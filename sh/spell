@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+set -e # exit if a commands returns a non-zero value
+
+blue="\033[00;34m"
+red="\033[00;31m"
+reset="\033[00m"
+
+error() {
+  # >&2 echo -e "${red}[error] $1${reset}"
+  echo -e "${red}[error] $1${reset}"
+}
+
+info() {
+  echo -e "${blue}[info] $1${reset}"
+}
+
+HELP="
+
+USAGE:
+
+  spell [OPTIONS] <FILE_PATH>
+
+OPTIONS
+  -h, --help, h, help        show the help
+  --no-trans, -nt, --local   do not translate
+  --no-spell, -ns            do not check the spell
+"
+
+show_help () {
+  echo "$HELP"
+}
+
+TMP="/tmp/stuff/spell"
+rm -rf "${TMP}"
+mkdir -p "${TMP}"
+
+spell_file () {
+  if [ -z "$1" ]; then # if $1 is empty
+    error "you need to specify the file path"
+    exit 1
+  fi
+  file="$1"
+  parent="$(dirname $(dirname "$0"))"
+  config_path="${parent}/conf/cspell.json"
+  (
+    set -x # print each command before executing it
+    cspell --config "${config_path}" "${file}"
+  )
+}
+
+translate () {
+  if [ -z "$1" ]; then # if $1 is empty
+    error "you need to specify the file path"
+    exit 1
+  fi
+
+  file="$1"
+  (
+    set -x # print each command before executing it
+    trans -brief -to it -i "${file}" -o "${TMP}/it_${file}"
+    trans -brief -to en -i "${TMP}/it_${file}" -o "${TMP}/en_${file}"
+  )
+}
+
+show_diff () {
+  if [ -z "$1" ]; then # if $1 is empty
+    error "you need to specify the file path"
+    exit 1
+  fi
+  file="$1"
+  (
+    set +e # turns off the "e" option (it will not exit if a commands returns a non-zero value)
+    set -x # print each command before executing it
+
+    banner it && bat -pP "${TMP}/it_${file}"
+    delta --side-by-side --paging=never "${file}" "${TMP}/it_${file}"
+
+    banner en && bat -pP "${TMP}/en_${file}"
+    delta --side-by-side --paging=never "${TMP}/en_${file}" "${file}"
+  )
+}
+
+case "$1" in
+  "h"|"-h"|"help"|"--help")
+    show_help
+    ;;
+  "--no-trans"|"-nt"|"--local")
+    spell_file "$2"
+    show_diff "$2"
+    ;;
+  "--no-spell"|"-ns")
+    translate "$2"
+    show_diff "$2"
+    ;;
+  *)
+    if (( $# != 1 )); then
+      error "unknown option $1"
+      show_help
+      exit 1
+    fi
+    spell_file "$1"
+    translate "$1"
+    show_diff "$1"
+    ;;
+esac
