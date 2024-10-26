@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
 
-set -e # e  exit if a commands returns a non-zero value
+set -e # exit if a commands returns a non-zero value
 
 blue="\033[00;34m"
 red="\033[00;31m"
 reset="\033[00m"
+
+error() {
+  echo -e "${red}[error] $1${reset}";
+}
+
+info() {
+  echo -e "${blue}[info] $1${reset}";
+}
 
 HELP="
 
@@ -19,6 +27,9 @@ ACTIONS:
 
   pull
     pull the changes, shows the git status, the stash list and the unmerged branches
+
+  push <message>
+    pull, commit and push
 
   log [search pattern]
     if text-filter is not specified logs the lasts 60 commits,
@@ -53,125 +64,139 @@ ACTIONS:
     show this help
 "
 
-WRONG_SYNTAX="
-${red}ERROR: wrong syntax.${reset}
-$HELP"
+help () {
+  echo "$HELP"
+}
 
-label() {
-  echo -e "\n${blue}$1${reset}\n";
+wrong_syntax () {
+  error "wrong syntax"
+  help
+  exit 1
 }
 
 status() {
-  label "git status -sb"
+  info "git status -sb"
   git status -sb
-  label "git cherry -v # lists local commits that require a push"
+  info "git cherry -v # lists local commits that require a push"
   git cherry -v
-  label "git stash list"
+  info "git stash list"
   git stash list
-  label "git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*'"
+  info "git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*'"
   git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*'
 }
 
 pull() {
-  label "git pull"
+  info "git pull"
   git pull
   status
   olds=$(git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | wc -l)
   if (( $olds > 0 )); then
     read -p "Do you want to remove the merged branches? (yes/no) " yn
     if [ "$yn" = "yes" ]; then
-      label "git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | xargs git branch -d"
+      info "git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | xargs git branch -d"
       git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | xargs git branch -d
     fi
   fi
 }
 
+push() {
+  if [ -z "$1" ]; then # if $1 is empty
+    error "you need to specify the commit message"
+    exit 1
+  fi
+
+  info "git pull && git commit -m "'"'"$1"'"'" && git push"
+  git pull && git commit -m "$1" && git push
+  info "git status"
+  git status
+}
+
 log() {
   if [ -z "$1" ]; then # if $1 is empty
-    label "git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --max-count=60 | grep -v 'Merge' | tac"
+    info "git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --max-count=60 | grep -v 'Merge' | tac"
     git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --max-count=60 | grep -v 'Merge' | tac
   else
-    label "git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M'  | grep -e \"$1\" | grep -v 'Merge' | tac"
+    info "git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M'  | grep -e \"$1\" | grep -v 'Merge' | tac"
     git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M'  | grep -e "$1" | grep -v 'Merge' | tac
   fi
 }
 
 diff() {
-  label "git difftool --tool=meld --dir-diff $@"
+  info "git difftool --tool=meld --dir-diff $@"
   git difftool --tool=meld --dir-diff $@;
 }
 
 mr() {
   # if $1 is empty print the help and exit
-  if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
+  if [ -z "$1" ]; then wrong_syntax; fi
 
   commit="$1"
   branch="$(echo $1 | sd ' ' '-')"
-  label "git checkout -b $branch" && \
+  info "git checkout -b $branch" && \
   git checkout -b $branch && \
-  label "git commit -m $commit" && \
+  info "git commit -m $commit" && \
   git commit -m "$commit" && \
-  label "git push --set-upstream origin $branch" && \
+  info "git push --set-upstream origin $branch" && \
   git push --set-upstream origin $branch;
 }
 
 stash_unstaged() {
   # if $1 is empty print the help and exit
-  if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
+  if [ -z "$1" ]; then wrong_syntax; fi
 
   path="$1"
-  label "git commit -m 'temp'" && \
+  info "git commit -m 'temp'" && \
   git commit -m 'temp' && \
-  label "git stash save \"$1\"" && \
+  info "git stash save \"$1\"" && \
   git stash save "$1" && \
-  label "git reset HEAD^1" && \
+  info "git reset HEAD^1" && \
   git reset HEAD^1 && \
-  label "git add ." && \
+  info "git add ." && \
   git add .
 }
 
 checkout() {
   # if $1 is empty print the help and exit
-  if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
+  if [ -z "$1" ]; then wrong_syntax; fi
 
   branchName="$1"
-  label "git stash" && \
+  info "git stash" && \
   git stash && \
-  label "git checkout $branchName" && \
+  info "git checkout $branchName" && \
   git checkout $branchName && \
-  label "git pull" && \
+  info "git pull" && \
   git pull && \
-  label "git stash pop" && \
+  info "git stash pop" && \
   git stash pop
 }
 
 restore() {
   # if $1 is empty print the help and exit
-  if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
+  if [ -z "$1" ]; then wrong_syntax; fi
 
   paths="$@"
-  label "git reset HEAD $paths" && \
+  info "git reset HEAD $paths" && \
   git reset HEAD $paths && \
-  label "git add $paths" && \
+  info "git add $paths" && \
   git add $paths && \
-  label "git reset HEAD $paths" && \
+  info "git reset HEAD $paths" && \
   git reset HEAD $paths && \
-  label "git checkout $paths" && \
+  info "git checkout $paths" && \
   git checkout $paths
 }
 
 apply() {
   # if $1 is empty print the help and exit
-  if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
+  if [ -z "$1" ]; then wrong_syntax; fi
 
   patch_file="$1"
-  label "git apply --3way --ignore-space-change --ignore-whitespace \"$patch_file\"" && \
+  info "git apply --3way --ignore-space-change --ignore-whitespace \"$patch_file\"" && \
   git apply --3way --ignore-space-change --ignore-whitespace "$patch_file"
 }
 
 list() {
   # if $1 is empty print the help and exit
-  if [ -z "$1" ]; then echo -e "$WRONG_SYNTAX"; exit; fi
+  if [ -z "$1" ]; then wrong_syntax; fi
 
   case "$1" in
     "untracked" | "?")
@@ -190,7 +215,8 @@ list() {
       git status -sb | grep '^ D ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
       ;;
     *)
-      echo -e "$WRONG_SYNTAX"; exit ;;
+      wrong_syntax
+      ;;
   esac
   echo ""
 }
@@ -200,6 +226,8 @@ case "$1" in
     status ;;
   "pull")
     pull ;;
+  "push")
+    push "$2" ;;
   "log")
     log "$2" ;;
   "diff")
@@ -216,6 +244,8 @@ case "$1" in
     apply "$2" ;;
   "list")
     list "$2" ;;
+  "h"|"-h"|"help"|"--help")
+    help ;;
   *)
-    echo "$HELP" ;;
+    wrong_syntax ;;
 esac
