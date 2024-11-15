@@ -2,9 +2,11 @@ bat: bat: a cat clone with syntax highlighting and Git integration
 bottom: btm: cli system monitor
 bunyan: bunyan: pretty print structured logs
 cfonts: cfonts: cool fonts in the console
+clima: clima: minimal markdown viewer
 difftastic: difft: structural diff tool that understands syntax (of over 30 programming languages)
 du-dust: dust: gives you an instant overview of which directories are using disk space
 dum: dum: a faster npm scripts runner
+eva: eva: calculator REPL similar to bc
 fd-find: fd: finds entries in your filesystem
 gitui: gitui: a git GUI right in your terminal
 jwt-cli: jwt: decode and encode JWTs

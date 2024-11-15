@@ -144,10 +144,11 @@ function wait_get {
 }
 
 function wait_for {
-  echo -n "WAIT FOR: $1 ..."
+  echo -n "WAIT FOR $1 ..."
   count=0
-  status=$(((eval "$1" &> /dev/null) && echo "success" || echo "error")  )
-  while [ "$status" != "success" ]
+  eval "$1" &> /dev/null
+  status=$?
+  while [ "$status" != "0" ]
   do
     count=$((count + 1))
     if (( count > 60 )); then
@@ -156,7 +157,8 @@ function wait_for {
     fi
     sleep 3
     echo -n "."
-    status=$(((eval "$1" &> /dev/null) && echo "success" || echo "error")  )
+    eval "$1" &> /dev/null
+    status=$?
   done
   echo " completed successfully"
 }
@@ -217,7 +219,6 @@ alias lla='show_alias lla; ls -ohNa --group-directories-first'
 alias commands='show_alias commands; compgen -abckA function | sort -u'
 alias bp='bat -pp'
 alias trash='gio trash'
-alias trash_list='show_alias trash_list; ls -1 /home/$USER/.local/share/Trash/files'
 alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
 alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
 alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | sd ' \([^)]+\)' '' | sd ':amd64' '' | sd ',' '' | rg -i 'install|upgrade|remove|purge'"
@@ -257,10 +258,12 @@ alias xopen='show_alias xopen; xdg-open'
 alias yt-mp3='show_alias yt-mp3; yt-dlp --extract-audio --audio-format mp3'
 alias render_html='lynx --stdin -dump -width 160'
 alias weather='show_alias weather; curl wttr.in'
+alias clima='clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p' # markdown viewer
 alias mocp='mocp -T dark'
 alias mp='mousepad'
 alias code='codium-insiders'
 alias search='show_alias search; banner search && rg --sort=path'
+alias hg='show_alias hg; history | rg'
 
 alias db='psql -U postgres -h localhost -p 5432 mydb' # cspell:disable-line
 alias dbclip='sql="$(xclip -selection c -o)" && \
@@ -292,6 +295,10 @@ google-chrome \
   --ignore-certificate-errors \
   --unsafely-treat-insecure-origin-as-secure=https://localhost
 '
+
+### GIT config by env vars
+# @see https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables
+export GIT_PAGER=riff
 
 ### PATH
 export PATH="$PATH:/opt/bin:$STUFF_PATH/sh:$STUFF_PATH/zx:$STUFF_PATH/nodejs"

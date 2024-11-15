@@ -31,8 +31,10 @@ find . -exec grep chrome "{}" \;
 find . -exec grep chrome "{}" +
 ```
 
-find will execute grep and will substitute {} with the filename(s) found. The difference between ; and + is that with ; a single grep command for each file is executed whereas with + as many files as possible are given as parameters to grep at once.
-
+**find** will execute **grep** and will substitute `{}` with the filename(s) found.
+The difference between `;` and `+` is that with `;` a single grep command
+for each file is executed whereas with `+` as many files as possible
+are given as parameters to grep at once.
 
 ### Run a remote command detached from your local environment
 
@@ -43,7 +45,14 @@ ssh user@domain screen -d -m remote_command
 
 ### Working with the clipboard
 
-xsel can copy and paste to three different "clipboards". By default, it uses the X Window System primary selection, which is basically whatever is currently in selection. The X Window System also has a secondary selection (which isn't used much), and a clipboard selection. You're probably looking for the clipboard selection, since that's what the desktop environment (e.g. Gnome, KDE, XFCE) uses for its clipboard. To use that with xsel:
+xsel can copy and paste to three different "clipboards".
+By default, it uses the X Window System primary selection, which is basically
+whatever is currently in selection.
+The X Window System also has a secondary selection (which isn't used much),
+and a clipboard selection.
+You're probably looking for the clipboard selection, since that's what the
+desktop environment (e.g. Gnome, KDE, XFCE) uses for its clipboard.
+To use that with xsel:
 
 ```bash
 xsel --clipboard < new-clipboard-contents.txt
