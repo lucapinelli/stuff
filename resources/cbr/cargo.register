@@ -7,11 +7,13 @@ du-dust: dust: gives you an instant overview of which directories are using disk
 dum: dum: a faster npm scripts runner
 fd-find: fd: finds entries in your filesystem
 gitui: gitui: a git GUI right in your terminal
+jwt-cli: jwt: decode and encode JWTs
 kondo: kondo: cleans node_modules, target, build, and friends from your projects
 loc: loc: a tool for counting lines of code
 mdbook: mdbook: an utility to create modern online books from Markdown files
 miniserve: miniserve: a small, self-contained cross-platform CLI tool that allows you to serve some file(s) via HTTP
 ouch: ouch: easily compressing and decompressing files and directories
+oxker: oxker: view & control docker containers
 procs: procs: a modern replacement for ps
 redis-query: redis-query: dev-tool to search keys in multiple Redis' databases
 riffdiff: riff: A diff highlighter

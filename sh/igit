@@ -81,20 +81,22 @@ status() {
   git cherry -v
   info "git stash list"
   git stash list
-  info "git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*'"
-  git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*'
+  info "git branch"
+  git branch
 }
 
 pull() {
   info "git pull"
   git pull
   status
-  olds=$(git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | wc -l)
-  if (( $olds > 0 )); then
-    read -p "Do you want to remove the merged branches? (yes/no) " yn
-    if [ "$yn" = "yes" ]; then
-      info "git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | xargs git branch -d"
-      git branch --merged | grep -vE ' development$| qa$| master$| main$| .*\.x$|^\*' | xargs git branch -d
+  info "git fetch --dry-run --prune # list removed branches"
+  removed=$(git fetch --dry-run --prune 2>&1)
+  if [ -n "${removed}" ]; then
+    info "Removed branches:\n${removed}"
+    read -p "Clean up removed branches? (y/n, default n) " yn
+    if [ "$yn" = "y" ]; then
+      info 'git fetch --prune'
+      git fetch --prune
     fi
   fi
 }
