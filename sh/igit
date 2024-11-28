@@ -53,12 +53,13 @@ ACTIONS:
   apply <file.patch>
     applies the specified patch
 
-  list [OPT]
-    list file that has been:
-    ?, untracked
-    A, added
-    M, modified
-    D, deleted
+  list <type> [-1]
+    <type> list file that has been:
+            ?, untracked
+            A, added
+            M, modified
+            D, deleted
+    -1      list one file per line
 
   help
     show this help
@@ -202,25 +203,44 @@ list() {
 
   case "$1" in
     "untracked" | "?")
-      git status -sb | grep '^[?][?] ' | sed -r 's/.. "?([^"]*)"?/"\1"/g' | tr '\n' ' '
+      if [ "$2" = "-1" ]; then
+        git status -sb | grep '^[?][?] ' | sed -r 's/.. "?([^"]*)"?/"\1"/g'
+      else
+        git status -sb | grep '^[?][?] ' | sed -r 's/.. "?([^"]*)"?/"\1"/g' | tr '\n' ' '
+        echo ""
+      fi
       ;;
 
     "added" | "A")
-      git status -sb | grep '^A  ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+      if [ "$2" = "-1" ]; then
+        git status -sb | grep '^A  ' | sed -r 's/.. (.*)/\1/g'
+      else
+        git status -sb | grep '^A  ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+        echo ""
+      fi
       ;;
 
     "modified" | "M")
-      git status -sb | grep '^ M ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+      if [ "$2" = "-1" ]; then
+        git status -sb | grep '^ M ' | sed -r 's/.. (.*)/\1/g'
+      else
+        git status -sb | grep '^ M ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+        echo ""
+      fi
       ;;
 
     "deleted" | "D")
-      git status -sb | grep '^ D ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+      if [ "$2" = "-1" ]; then
+        git status -sb | grep '^ D ' | sed -r 's/.. (.*)/\1/g'
+      else
+        git status -sb | grep '^ D ' | sed -r 's/.. (.*)/\1/g' | tr '\n' ' '
+        echo ""
+      fi
       ;;
     *)
       wrong_syntax
       ;;
   esac
-  echo ""
 }
 
 case "$1" in
@@ -245,7 +265,7 @@ case "$1" in
   "apply")
     apply "$2" ;;
   "list")
-    list "$2" ;;
+    list "$2" "$3" ;;
   "h"|"-h"|"help"|"--help")
     help ;;
   *)
