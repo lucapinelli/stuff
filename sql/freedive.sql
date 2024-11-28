@@ -132,7 +132,7 @@ group by Year, Month
 --order by Year, Month
 order by max(AvgDepth) desc
 
--- count MaxDepth
+-- MaxDepth count metrix
 select
   Year,
   Month,
@@ -151,7 +151,7 @@ where MaxDepth >= 16
 group by Year, Month
 order by Year, Month
 
--- count Duration
+-- Duration count matrix
 select
   Year,
   Month,
@@ -169,3 +169,17 @@ from freedive
 where Duration >= 60
 group by Year, Month
 order by Year, Month
+
+-- Depth target count
+select Year, Month, count(*) count, avg(MaxDepth) depth
+from FreeDive
+where MaxDepth > 20
+group by Year, Month
+order by count(*) desc
+
+-- Duration target count
+select Year, Month, count(*) count, avg(Duration) seconds
+from FreeDive
+where Duration > 100 -- 1'40"
+group by Year, Month
+order by count(*) desc
