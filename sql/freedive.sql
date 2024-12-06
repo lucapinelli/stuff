@@ -136,18 +136,15 @@ order by max(AvgDepth) desc
 select
   Year,
   Month,
-  count(*) d16,
-  count(case when MaxDepth >= 17 then 1 end) d17,
-  count(case when MaxDepth >= 18 then 1 end) d18,
-  count(case when MaxDepth >= 19 then 1 end) d19,
-  count(case when MaxDepth >= 20 then 1 end) d20,
-  count(case when MaxDepth >= 21 then 1 end) d21,
-  count(case when MaxDepth >= 22 then 1 end) d22,
-  count(case when MaxDepth >= 23 then 1 end) d23,
-  count(case when MaxDepth >= 24 then 1 end) d24,
+  count(case when MaxDepth between 19 and 20 then 1 end) d19,
+  count(case when MaxDepth between 20 and 21 then 1 end) d20,
+  count(case when MaxDepth between 21 and 22 then 1 end) d21,
+  count(case when MaxDepth between 22 and 23 then 1 end) d22,
+  count(case when MaxDepth between 23 and 24 then 1 end) d23,
+  count(case when MaxDepth between 24 and 25 then 1 end) d24,
   count(case when MaxDepth >= 25 then 1 end) d25
 from freedive
-where MaxDepth >= 16
+where MaxDepth > 19
 group by Year, Month
 order by Year, Month
 
@@ -155,31 +152,29 @@ order by Year, Month
 select
   Year,
   Month,
-  count(*) m1_00,
-  count(case when Duration >=  70 then 1 end) m1_10,
-  count(case when Duration >=  80 then 1 end) m1_20,
-  count(case when Duration >=  90 then 1 end) m1_30,
-  count(case when Duration >= 100 then 1 end) m1_40,
-  count(case when Duration >= 110 then 1 end) m1_50,
-  count(case when Duration >= 120 then 1 end) m2_00,
-  count(case when Duration >= 130 then 1 end) m2_10,
-  count(case when Duration >= 140 then 1 end) m2_20,
-  count(case when Duration >= 150 then 1 end) m2_30
+  count(case when Duration between 108 and 114 then 1 end) "1:48",
+  count(case when Duration between 114 and 120 then 1 end) "1:54",
+  count(case when Duration between 120 and 126 then 1 end) "2:00",
+  count(case when Duration between 126 and 132 then 1 end) "2:06",
+  count(case when Duration between 132 and 138 then 1 end) "2:12",
+  count(case when Duration between 138 and 144 then 1 end) "2:18",
+  count(case when Duration between 144 and 150 then 1 end) "2:24",
+  count(case when Duration >= 150 then 1 end) "2:30"
 from freedive
-where Duration >= 60
+where Duration > 108
 group by Year, Month
 order by Year, Month
 
 -- Depth target count
 select Year, Month, count(*) count, avg(MaxDepth) depth
 from FreeDive
-where MaxDepth > 20
+where MaxDepth > 21
 group by Year, Month
-order by count(*) desc
+order by Year, Month
 
 -- Duration target count
 select Year, Month, count(*) count, avg(Duration) seconds
 from FreeDive
-where Duration > 100 -- 1'40"
+where Duration > 108 -- 1'48"
 group by Year, Month
-order by count(*) desc
+order by Year, Month

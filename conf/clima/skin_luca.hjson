@@ -1,4 +1,5 @@
-# A termimad skin that you can use with the --skin argument
+# A termimad skin for the `clima` command
+# that you can use with the --skin argument
 #
 # When two colors are provided, the first one is foreground
 # and the second one background. If you want to set only
@@ -10,7 +11,7 @@
 # rgb(95,95,180) Blueberry
 # rgb(0,175,255) Cerulean (cyan)
 
-paragraph: gray(16) 4 4
+paragraph: gray(16) 2 2
 code_block: gray(16) gray(4) 4
 inline-code: rgb(95,95,200) gray(4)
 bold: rgb(95,95,180) bold
@@ -18,13 +19,13 @@ italic: rgb(95,95,180) italic
 bullet: • rgb(95,95,255) bold
 headers: [
   rgb(255,255,135) rgb(95,95,255) bold center
-  rgb(0,175,255) bold center
   rgb(0,175,255) bold
   rgb(0,175,255) underlined
   rgb(0,175,255)
-  rgb(0,175,255)
-  rgb(0,175,255)
-  rgb(0,175,255)
+  rgb(0,125,205)
+  rgb(0,105,185)
+  rgb(0,105,185)
+  rgb(0,105,185)
 ]
 quote: ▐ rgb(95,95,180)
 horizontal-rule: "━ rgb(95,95,255)"
