@@ -12,8 +12,8 @@
 # rgb(0,175,255) Cerulean (cyan)
 
 paragraph: gray(16) 2 2
-code_block: gray(16) gray(4) 4
-inline-code: rgb(95,95,200) gray(4)
+code_block: rgb(95,95,180) gray(4) 4
+inline-code: rgb(95,95,180) gray(4)
 bold: rgb(95,95,180) bold
 italic: rgb(95,95,180) italic
 bullet: • rgb(95,95,255) bold
