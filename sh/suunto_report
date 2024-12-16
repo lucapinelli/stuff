@@ -76,11 +76,11 @@ echo "$create_view" | bat --plain -l sql
 sqlite3 "$db_file_name" "$create_view"
 
 echo "
-    ╭─────────────────────╮
-    │ ╭─────────────────╮ │
-    │ │ FREEDIVE REPORT │ │
-    │ ╰─────────────────╯ │
-    ╰─────────────────────╯
+                               ╭─────────────────────╮
+                               │ ╭─────────────────╮ │
+                               │ │ FREEDIVE REPORT │ │
+                               │ ╰─────────────────╯ │
+                               ╰─────────────────────╯
 "
 
 print_graph () {
@@ -125,6 +125,104 @@ print_graph () {
   echo
 }
 
+deepest_dive () {
+
+  if [[ "$1" ==  "" ]]; then
+
+    best=$(
+      echo "
+        select
+          strftime('%Y-%m-%d', date(DiveDate)) DiveDay,
+          ApneaTime,
+          MaxDepth,
+          Temperature
+        from FreeDive
+        order by MaxDepth desc, DiveDate
+        limit 1
+      " | sqlite3 "$db_file_name"
+    )
+
+    echo "
+    ╭──────────────╮
+    │ Deepest Dive │
+    ╰──────────────╯
+
+    $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${1} ${3} mt, ${2}, ${4}°')
+    "
+  else
+
+    best=$(
+      echo "
+        select
+          strftime('%Y-%m-%d', date(DiveDate)) DiveDay,
+          ApneaTime,
+          MaxDepth,
+          Temperature
+        from FreeDive
+        where year = $1
+        order by MaxDepth desc, DiveDate
+        limit 1
+      " | sqlite3 "$db_file_name"
+    )
+
+    echo "
+    ╭───────────────────╮
+    │ Deepest Dive ${1} │
+    ╰───────────────────╯
+
+    $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${1} ${3} mt, ${2}, ${4}°')
+    "
+
+  fi
+}
+
+best_duration () {
+  if [[ "$1" ==  "" ]]; then
+    best=$(
+      echo "
+        select
+          strftime('%Y-%m-%d', date(DiveDate)) DiveDay,
+          ApneaTime,
+          MaxDepth,
+          Temperature
+        from FreeDive
+        order by ApneaTime desc, DiveDate
+        limit 1
+      " | sqlite3 "$db_file_name"
+    )
+
+    echo "
+    ╭───────────────╮
+    │ Best Duration │
+    ╰───────────────╯
+
+    $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${1} ${2}, ${3} mt, ${4}°')
+    "
+  else
+    best=$(
+      echo "
+        select
+          strftime('%Y-%m-%d', date(DiveDate)) DiveDay,
+          ApneaTime,
+          MaxDepth,
+          Temperature
+        from FreeDive
+        where year = $1
+        order by ApneaTime desc, DiveDate
+        limit 1
+      " | sqlite3 "$db_file_name"
+    )
+
+    echo "
+    ╭────────────────────╮
+    │ Best Duration ${1} │
+    ╰────────────────────╯
+
+    $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${1} ${2}, ${3} mt, ${4}°')
+    "
+  fi
+}
+
 report () {
 
     echo "
@@ -148,7 +246,7 @@ report () {
       limit 30
     )
     order by DiveDay
-    " | sqlite3 "$db_file_name"
+    " | sqlite3 "$db_file_name" | sd '^' '    '
 
     echo "
     ╭──────────────╮
@@ -174,7 +272,7 @@ report () {
       limit 10
     ) TopRef where TopRef.id = DiveId
     order by Duration desc, DiveDate
-    " | sqlite3 "$db_file_name"
+    " | sqlite3 "$db_file_name" | sd '^' '    '
 
     echo "
     ╭───────────╮
@@ -200,7 +298,7 @@ report () {
       limit 10
     ) TopRef where TopRef.id = DiveId
     order by MaxDepth desc, DiveDate
-    " | sqlite3 "$db_file_name"
+    " | sqlite3 "$db_file_name" | sd '^' '    '
 
     echo "
     ╭────────────────╮
@@ -226,7 +324,7 @@ report () {
       limit 10
     ) TopRef where TopRef.id = DiveId
     order by AvgDepth desc, DiveDate
-    " | sqlite3 "$db_file_name"
+    " | sqlite3 "$db_file_name" | sd '^' '    '
 
     echo "
     ╭──────────────────────────────╮
@@ -250,7 +348,7 @@ report () {
     	group by TopTime.Month
     ) TopRef on TopRef.DiveId = FreeDive.DiveId
     order by Duration desc
-    " | sqlite3 "$db_file_name"
+    " | sqlite3 "$db_file_name" | sd '^' '    '
 
     echo "
     ╭───────────────────────────╮
@@ -274,7 +372,7 @@ report () {
     	group by TopDepth.Month
     ) TopRef on TopRef.DiveId = FreeDive.DiveId
     order by MaxDepth desc
-    " | sqlite3 "$db_file_name"
+    " | sqlite3 "$db_file_name" | sd '^' '    '
 
     echo "
     ╭────────────────────────────────╮
@@ -298,7 +396,7 @@ report () {
     	group by TopAvgDepth.Month
     ) TopRef on TopRef.DiveId = FreeDive.DiveId
     order by AvgDepth desc
-    " | sqlite3 "$db_file_name"
+    " | sqlite3 "$db_file_name" | sd '^' '    '
 
     echo "
     ╭────────────────────────╮
@@ -351,46 +449,13 @@ report () {
     " | sqlite3 "$db_file_name" | tail +3`
     print_graph "$rows" "$max" "    "
 
-    best=$(
-      echo "
-        select
-          strftime('%Y-%m-%d', date(DiveDate)) DiveDay,
-          ApneaTime,
-          MaxDepth,
-          Temperature
-        from FreeDive
-        order by MaxDepth desc, DiveDate
-        limit 1
-      " | sqlite3 "$db_file_name"
-    )
+    deepest_dive 2023
 
-    echo "
-    ╭───────────────────────────────────╮
-    │ Best Dive Depth $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${3} mt')          │
-    │ $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${1} duration ${2} temp ${4}°') │
-    ╰───────────────────────────────────╯
-    "
+    best_duration 2023
 
-    best=$(
-      echo "
-        select
-          strftime('%Y-%m-%d', date(DiveDate)) DiveDay,
-          ApneaTime,
-          MaxDepth,
-          Temperature
-        from FreeDive
-        order by ApneaTime desc, DiveDate
-        limit 1
-      " | sqlite3 "$db_file_name"
-    )
+    deepest_dive
 
-    echo "
-    ╭────────────────────────────────────╮
-    │ Best Dive Time $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${2}')                │
-    │ $(echo "$best" | sd '(.*)\|(.*)\|(.*)\|(.*)' '${1} depth ${3} mt temp ${4}°')  │
-    ╰────────────────────────────────────╯
-    "
-
+    best_duration
 }
 
 report > "$report_file_name"
