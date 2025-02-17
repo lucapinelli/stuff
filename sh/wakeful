@@ -23,7 +23,7 @@ then
     exit
 fi
 
-interval=120
+interval=90
 is_integer='^[0-9]+$'
 
 if [[ ! -z $1 ]] ; then
@@ -42,6 +42,7 @@ then
 fi
 
 echo "started at $(date) (interval $interval seconds)"
+echo
 
 mouse_x=0
 mouse_y=0
@@ -69,13 +70,15 @@ update_previous_location () {
 
 update_previous_location
 
+woke=0
 awaken () {
   update_mouse_location
 
   # if mouse not moved
   if (( previous_x == mouse_x && previous_y == mouse_y && previous_screen == mouse_screen )); then
     # do not let the laptop to go asleep
-    echo "wakeful $(date)"
+    woke=$((++woke))
+    echo -e "\e[1A\e[Kwakeful $(date) (#${woke}, $(((woke * interval) / 60)) minutes)"
     xdotool mousemove_relative -- 0 -10
     xdotool sleep 0.1
     xdotool mousemove_relative -- -10 0
@@ -83,6 +86,11 @@ awaken () {
     xdotool mousemove_relative 0 10
     xdotool sleep 0.1
     xdotool mousemove_relative 10 0
+  else
+    if (( woke != 0 )); then
+      echo
+    fi
+    woke=0
   fi
 
   update_previous_location

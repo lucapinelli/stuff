@@ -136,15 +136,20 @@ order by max(AvgDepth) desc
 select
   Year,
   Month,
-  count(case when MaxDepth between 19 and 20 then 1 end) d19,
-  count(case when MaxDepth between 20 and 21 then 1 end) d20,
-  count(case when MaxDepth between 21 and 22 then 1 end) d21,
-  count(case when MaxDepth between 22 and 23 then 1 end) d22,
-  count(case when MaxDepth between 23 and 24 then 1 end) d23,
-  count(case when MaxDepth between 24 and 25 then 1 end) d24,
-  count(case when MaxDepth >= 25 then 1 end) d25
+  count(case when MaxDepth between 21 and 21.999 then 1 end) "21",
+  count(case when MaxDepth between 22 and 22.999 then 1 end) "22",
+  count(case when MaxDepth between 23 and 23.999 then 1 end) "23",
+  count(case when MaxDepth between 24 and 24.999 then 1 end) "24",
+  count(case when MaxDepth between 25 and 25.999 then 1 end) "26",
+  count(case when MaxDepth between 26 and 26.999 then 1 end) "26",
+  count(case when MaxDepth between 27 and 27.999 then 1 end) "27",
+  count(case when MaxDepth between 28 and 28.999 then 1 end) "28",
+  count(case when MaxDepth between 29 and 29.999 then 1 end) "29",
+  count(case when MaxDepth between 30 and 30.999 then 1 end) "30",
+  count(case when MaxDepth between 31 and 31.999 then 1 end) "31",
+  count(case when MaxDepth >= 32 then 1 end) "32+"
 from freedive
-where MaxDepth > 19
+where MaxDepth >= 21
 group by Year, Month
 order by Year, Month
 
@@ -152,29 +157,65 @@ order by Year, Month
 select
   Year,
   Month,
-  count(case when Duration between 108 and 114 then 1 end) "1:48",
-  count(case when Duration between 114 and 120 then 1 end) "1:54",
-  count(case when Duration between 120 and 126 then 1 end) "2:00",
-  count(case when Duration between 126 and 132 then 1 end) "2:06",
-  count(case when Duration between 132 and 138 then 1 end) "2:12",
-  count(case when Duration between 138 and 144 then 1 end) "2:18",
-  count(case when Duration between 144 and 150 then 1 end) "2:24",
-  count(case when Duration >= 150 then 1 end) "2:30"
+  count(case when Duration between  84 and  89 then 1 end) "1:24",
+  count(case when Duration between  90 and  95 then 1 end) "1:30",
+  count(case when Duration between  96 and 101 then 1 end) "1:36",
+  count(case when Duration between 102 and 107 then 1 end) "1:42",
+  count(case when Duration between 108 and 113 then 1 end) "1:48",
+  count(case when Duration between 114 and 119 then 1 end) "1:54",
+  count(case when Duration between 120 and 125 then 1 end) "2:00",
+  count(case when Duration between 126 and 131 then 1 end) "2:06",
+  count(case when Duration between 132 and 137 then 1 end) "2:12",
+  count(case when Duration between 138 and 143 then 1 end) "2:18",
+  count(case when Duration between 144 and 149 then 1 end) "2:24",
+  count(case when Duration >= 150 then 1 end) "2:30+"
 from freedive
-where Duration > 108
+where Duration >= 84
 group by Year, Month
 order by Year, Month
 
 -- Depth target count
-select Year, Month, count(*) count, avg(MaxDepth) depth
+select Year, Month, count(*) count, cast(round(avg(MaxDepth)) as integer) depth
 from FreeDive
-where MaxDepth > 21
+where MaxDepth > 22
 group by Year, Month
 order by Year, Month
 
 -- Duration target count
-select Year, Month, count(*) count, avg(Duration) seconds
+select Year, Month, count(*) count, cast(round(avg(Duration)) as integer) seconds
 from FreeDive
-where Duration > 108 -- 1'48"
+where Duration > 90 -- 1'30"
 group by Year, Month
 order by Year, Month
+
+-- ---------- --
+-- Cold Times --
+-- ---------- --
+
+-- MaxDepth
+select Year, Month, max(MaxDepth) MaxDepth
+from FreeDive
+where Temperature <= 16
+group by Year, Month
+order by max(MaxDepth) desc
+
+-- Top MaxDepth
+select DiveDate, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
+from FreeDive
+where Temperature <= 16
+order by MaxDepth desc, DiveDate
+limit 10
+
+-- ApneaTime
+select Year, Month, max(ApneaTime) ApneaTime
+from FreeDive
+where Temperature <= 16
+group by Year, Month
+order by max(ApneaTime) desc
+
+-- Top ApneaTime
+select DiveDate, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
+from FreeDive
+where Temperature <= 16
+order by Duration desc, DiveDate
+limit 10

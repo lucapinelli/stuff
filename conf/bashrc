@@ -115,9 +115,9 @@ function everywhere {
   SNIPPETS_HOME="$STUFF_PATH" snippets ${@:1:$#-1} "${@: -1}"
   SNIPPETS_HOME="$ZIMNOTE_PATH" snippets ${@:1:$#-1} "${@: -1}"
 }
-alias stuff="SNIPPETS_HOME="${STUFF_PATH}" snippets"
-alias notes="SNIPPETS_HOME="${NOTES_PATH}" snippets"
-alias zimnote="SNIPPETS_HOME="${ZIMNOTE_PATH}" snippets"
+alias stuff="SNIPPETS_HOME="${STUFF_PATH}" . snippets"
+alias notes="SNIPPETS_HOME="${NOTES_PATH}" . snippets"
+alias zimnote="SNIPPETS_HOME="${ZIMNOTE_PATH}" . snippets"
 
 function dict {
   curl "https://api.dictionaryapi.dev/api/v2/entries/en/$1" \
@@ -164,7 +164,7 @@ function wait_for {
 }
 
 function show_alias {
-  echo -en "\033[00;34m⚙ " # set color blue and print '+' without new line
+  echo -en "\033[00;34m⚙ " # set color blue and prefix '⚙' without new line
   alias $1 | sd '^[^=]*=' '' | sd '^[^;]*; *' ''  | sd '.$' ''
   echo -e '\033[00m' # reset the color
 }
@@ -204,6 +204,18 @@ function is_builtin {
 function is_keyword {
   found=$(compgen -k | rg "^$1$" | wc -l)
   if (( found > 0 )); then echo true; else echo false; fi
+}
+
+function wsearch {
+  # blue with prefix '⚙'
+  echo -e "\033[00;34m⚙ xdotool search --onlyvisible --name '$1' getwindowname \033[00m"
+  xdotool search --onlyvisible --name "$1" getwindowname
+}
+
+function wresize {
+  # blue with prefix '⚙'
+  echo -e "\033[00;34m⚙ xdotool search --onlyvisible --name '$1' windowsize 2129 1362 \033[00m"
+  xdotool search --onlyvisible --name "$1" windowsize 2129 1362
 }
 
 ### Alias
@@ -262,6 +274,7 @@ alias clima='clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p' # markdow
 alias mocp='mocp -T dark'
 alias mp='mousepad'
 alias code='codium-insiders'
+alias codews='show_alias codews; title && codium-insiders . && sleep 1 && xdotool search --name ".*${PWD##*/}.*vscodium.*" windowsize 2129 1362'
 alias search='show_alias search; banner search && rg --sort=path'
 alias hg='show_alias hg; history | rg'
 

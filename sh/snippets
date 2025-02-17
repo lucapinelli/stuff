@@ -112,7 +112,8 @@ case "$1" in
     "$IDE" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
   "open" | "o")
-    "$IDE" "$SNIPPETS_HOME"
+  cd "$SNIPPETS_HOME"
+  "$IDE" .
   ;;
   *)
     echo -e "$HELP"
