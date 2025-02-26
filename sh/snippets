@@ -37,14 +37,15 @@ ACTIONS:
 
   e, edit
     opens the first snippet with a name that matches the pattern in the
-    Helix editor
+    $TUI_EDITOR (Helix)
 
-  a, all
-    opens all the snippets with a name that matches the pattern in the
-    Pulsar editor
+  cd
+    change the shell root directory to the root folder of this project
+    # you need to define an alias or use:
+    . snippets cd
 
-  o, open
-    opens the root folder of the snippets using the Pulsar editor
+  ide
+    opens the root folder of the snippets using the $IDE (default: pulsar)
 
   h, help
     shows this help
@@ -52,23 +53,23 @@ ACTIONS:
 EXAMPLES:
 
   # Lists all the file and folders
-  snippets fd ".*"
+  snippets fd .
 
-  # Greps the word "bash" in all the files
+  # Greps the string "env bash" in all the files
   snippets rg "env bash"
 
-  # Show all the snippets that contains "move to"
+  # Shows the content of all the snippets with a name that contains "move to"
   snippets show "move to"
 
-  # Edit (using helix) the first snippet that is a json (.json) and with a name
+  # Edit the first snippet that is a json (.json) and with a name
   # that contains "message"
   snippets edit -e json "message"
 
-  # Edit (using lapce) all the snippets type json (the extension is .json)
-  snippets all -e json ".*"
+  # move the terminal in the root folder of the snippets project
+  . snippets cd
 
-  # opens the root folder of the snippets using the Atom editor
-  snippets open
+  # opens the root folder in the IDE
+  snippets ide
 
 DEPENDENCIES:
 
@@ -98,7 +99,6 @@ case "$1" in
     rg ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME"
   ;;
   "show" | "s")
-    #fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" -exec more
     fd --type f ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header --paging never
   ;;
   "clip" | "c")
@@ -108,12 +108,11 @@ case "$1" in
   "edit" | "e")
     "$TUI_EDITOR" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
   ;;
-  "all" | "a")
-    "$IDE" "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"
+  "cd")
+    cd "$SNIPPETS_HOME"
   ;;
-  "open" | "o")
-  cd "$SNIPPETS_HOME"
-  "$IDE" .
+  "ide")
+    "$IDE" .
   ;;
   *)
     echo -e "$HELP"

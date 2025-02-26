@@ -83,10 +83,6 @@ function which_package {
   dpkg -S $(which $1)
 }
 
-if [ -z $EDITOR ]; then
-  EDITOR=pulsar
-fi
-
 function doc {
   mkdir -p /tmp/alldoc
   if [ ! -f /tmp/alldoc/$1.txt ]; then
@@ -102,7 +98,7 @@ function doc {
     man $1 2>&1 | ansi2txt >> /tmp/alldoc/$1.txt
     echo "done :)"
   fi
-  $EDITOR /tmp/alldoc/$1.txt &
+  hx /tmp/alldoc/$1.txt
 }
 
 export SNIPPETS_HOME="${HOME}/code/luca.pinelli/snippets"
@@ -115,9 +111,10 @@ function everywhere {
   SNIPPETS_HOME="$STUFF_PATH" snippets ${@:1:$#-1} "${@: -1}"
   SNIPPETS_HOME="$ZIMNOTE_PATH" snippets ${@:1:$#-1} "${@: -1}"
 }
-alias stuff="SNIPPETS_HOME="${STUFF_PATH}" . snippets"
-alias notes="SNIPPETS_HOME="${NOTES_PATH}" . snippets"
-alias zimnote="SNIPPETS_HOME="${ZIMNOTE_PATH}" . snippets"
+alias snippets=". snippets"
+alias stuff="SNIPPETS_HOME="${STUFF_PATH}" snippets"
+alias notes="SNIPPETS_HOME="${NOTES_PATH}" snippets"
+alias zimnote="SNIPPETS_HOME="${ZIMNOTE_PATH}" snippets"
 
 function dict {
   curl "https://api.dictionaryapi.dev/api/v2/entries/en/$1" \
@@ -256,6 +253,9 @@ xclip -selection c -o \
  | xclip -selection c \
  && echo "new clipboard content: $(xclip -selection c -o)"
 '
+alias clip_toit='text="$(xclip -selection c -o)" && echo "$text" && echo "IT" && trans -brief -to it "$text"'
+alias clip_toen='text="$(xclip -selection c -o)" && echo "$text" && echo "EN" && trans -brief -to en "$text"'
+
 #alias bottom='show_alias bottom; xfce4-terminal --title=bottom --geometry=128x48+100+100 --command "btm --mem_as_value -g" &'
 alias bottom='show_alias bottom; gnome-terminal --title=bottom --geometry=128x48+100+100 -- btm --mem_as_value -g'
 alias jsonkv="jq -r '
@@ -274,7 +274,7 @@ alias clima='clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p' # markdow
 alias mocp='mocp -T dark'
 alias mp='mousepad'
 alias code='codium-insiders'
-alias codews='show_alias codews; title && codium-insiders . && sleep 1 && xdotool search --name ".*${PWD##*/}.*vscodium.*" windowsize 2129 1362'
+alias codews='show_alias codews; codium-insiders . && title && sleep 1 && xdotool search --name ".*${PWD##*/}.*vscodium.*" windowsize 2129 1362'
 alias search='show_alias search; banner search && rg --sort=path'
 alias hg='show_alias hg; history | rg'
 
@@ -282,15 +282,19 @@ alias db='psql -U postgres -h localhost -p 5432 mydb' # cspell:disable-line
 alias dbclip='sql="$(xclip -selection c -o)" && \
 echo "$sql" | bat --style grid --paging never -l sql && \
 db -c "$sql" | cat && \
-history -s "db -c \"
+history -s "db -c \"\$(
+cat <<EOF
 ${sql}
-\" | cat"'
+EOF
+)\" | cat"'
 alias dbxclip='sql="$(xclip -selection c -o)" && \
 echo "$sql" | bat --style grid --paging never -l sql && \
 db -xc "$sql" | cat && \
-history -s "db -xc \"
+history -s "db -xc \"\$(
+cat <<EOF
 ${sql}
-\" | cat"'
+EOF
+)\" | cat"'
 alias dbhistory='history | awk '"'"'
 { if ($1 ~ /[0-9]+/ && $2 == "db") db_cmd = "true" }
 { if ($1 ~ /[0-9]+/ && $2 != "db") db_cmd = "false" }

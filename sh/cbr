@@ -54,8 +54,16 @@ case $1 in
       cd "$project_path/resources/cbr"
       for crate in $(awk -F ': ' '{print $1}' cargo.register | sort); do
         echo -e "\nInstalling/upgrading create ${crate}..."
-        echo "$ cargo binstall -y $crate"
-        cargo binstall -y $crate
+        case $crate in
+          miniserve)
+            echo "$ cargo install $crate"
+            cargo install $crate
+          ;;
+          *)
+            echo "$ cargo binstall -y $crate"
+            cargo binstall -y $crate
+          ;;
+        esac
       done
     )
   ;;
