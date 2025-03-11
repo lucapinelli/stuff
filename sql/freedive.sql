@@ -177,16 +177,32 @@ order by Year, Month
 -- Depth target count
 select Year, Month, count(*) count, cast(round(avg(MaxDepth)) as integer) depth
 from FreeDive
-where MaxDepth > 22
+where MaxDepth >= 23
 group by Year, Month
 order by Year, Month
 
 -- Duration target count
 select Year, Month, count(*) count, cast(round(avg(Duration)) as integer) seconds
 from FreeDive
-where Duration > 90 -- 1'30"
+where Duration >= 90 -- 1'30"
 group by Year, Month
 order by Year, Month
+
+-- Count dive days per Month
+select
+  Year,
+  Month,
+  count(distinct Day) '#days',
+  cast(round(min(MaxDepth)) as integer) min_mt,
+  cast(round(avg(MaxDepth)) as integer) avg_mt,
+  cast(round(max(MaxDepth)) as integer) max_mt,
+  cast(round(min(Duration)) as integer) min_s,
+  cast(round(avg(Duration)) as integer) avg_s,
+  cast(round(max(Duration)) as integer) max_s
+from FreeDive
+group by Year, Month
+order by Year, Month
+
 
 -- ---------- --
 -- Cold Times --
@@ -195,27 +211,28 @@ order by Year, Month
 -- MaxDepth
 select Year, Month, max(MaxDepth) MaxDepth
 from FreeDive
-where Temperature <= 16
+where Temperature <= 17
 group by Year, Month
 order by max(MaxDepth) desc
 
 -- Top MaxDepth
 select DiveDate, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
 from FreeDive
-where Temperature <= 16
+where Temperature <= 17
 order by MaxDepth desc, DiveDate
 limit 10
 
 -- ApneaTime
 select Year, Month, max(ApneaTime) ApneaTime
 from FreeDive
-where Temperature <= 16
+where Temperature <= 17
 group by Year, Month
 order by max(ApneaTime) desc
 
 -- Top ApneaTime
 select DiveDate, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
 from FreeDive
-where Temperature <= 16
+where Temperature <= 17
 order by Duration desc, DiveDate
 limit 10
+

@@ -45,7 +45,7 @@ fi
 
 backup_name="$1"
 db_file_name="$(echo "$backup_name" | sd '\.db.bak$' '.db')"
-report_file_name="$(echo "$backup_name" | sd '\.db.bak$' '_report.txt' | sd '^DM.' '')"
+report_file_name="$(echo "$backup_name" | sd '\.db.bak$' '.txt' | sd '^DM.' 'report_')"
 
 echo "> SQLite 3 Database: ${db_file_name}"
 rm -f "$db_file_name"

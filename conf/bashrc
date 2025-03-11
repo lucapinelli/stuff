@@ -40,12 +40,28 @@ esac
 
 function okko {
   ok=$?
+  if [ -z "$1" ]; then # if no arguments
+    # verify if the previous executed command has succeed
   if  [ "$ok" = "0" ]; then
     art ok green
     sound powerup_success
   else
     art ko red
     sound error_6
+  fi
+  else
+    local_script=""
+    if [ -d "localhost" ]; then
+      local_script="$(fd "$1" localhost | head -n 1)"
+    fi
+    if [ -f "$local_script" ]; then # if we found a matching file in the ./localhost folder
+      echo "🐙 executing local script: $local_script ${@:2}"
+      "$local_script" ${@:2}
+      okko
+    else
+      $@ # run the arguments (as a command with paramenters)
+      okko
+    fi
   fi
 }
 
@@ -203,6 +219,21 @@ function is_keyword {
   if (( found > 0 )); then echo true; else echo false; fi
 }
 
+function sqcli {
+  echo ".mode column
+  $2
+  " | sqlite3 $1
+}
+
+function sqclip {
+  echo
+  clip_cat | bp -l sql
+  echo
+  echo ".mode column
+  $(clip_cat)
+  " | sqlite3 $1
+}
+
 function wsearch {
   # blue with prefix '⚙'
   echo -e "\033[00;34m⚙ xdotool search --onlyvisible --name '$1' getwindowname \033[00m"
@@ -211,8 +242,8 @@ function wsearch {
 
 function wresize {
   # blue with prefix '⚙'
-  echo -e "\033[00;34m⚙ xdotool search --onlyvisible --name '$1' windowsize 2129 1362 \033[00m"
-  xdotool search --onlyvisible --name "$1" windowsize 2129 1362
+  echo -e "\033[00;34m⚙ xdotool search --onlyvisible --name '$1'  windowmove 610 70 windowsize 1950 1360 \033[00m"
+  xdotool search --onlyvisible --name "$1" windowmove 610 70 windowsize 1950 1360
 }
 
 ### Alias
@@ -228,6 +259,7 @@ alias lla='show_alias lla; ls -ohNa --group-directories-first'
 alias commands='show_alias commands; compgen -abckA function | sort -u'
 alias bp='bat -pp'
 alias trash='gio trash'
+alias trim='sed '"'"'s/^ *//;s/ *$//'"'"
 alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
 alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
 alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | sd ' \([^)]+\)' '' | sd ':amd64' '' | sd ',' '' | rg -i 'install|upgrade|remove|purge'"
@@ -318,7 +350,7 @@ google-chrome \
 export GIT_PAGER=riff
 
 ### PATH
-export PATH="$PATH:/opt/bin:$STUFF_PATH/sh:$STUFF_PATH/zx:$STUFF_PATH/nodejs"
+export PATH="$PATH:$HOME/bin:$STUFF_PATH/sh:$STUFF_PATH/zx:$STUFF_PATH/nodejs"
 
   ######################################################################
   # WARNING!                                                           #
