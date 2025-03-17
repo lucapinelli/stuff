@@ -223,6 +223,30 @@ best_duration () {
   fi
 }
 
+stats_per_year () {
+  echo "
+    ╭────────────────╮
+    │ Stats per Year │
+    ╰────────────────╯
+  "
+  echo ".mode columns
+  select
+    Year,
+    count(distinct strftime('%Y-%m-%d', date(DiveDate))) '#days',
+    count(*) '#dives',
+    count(*) / count(distinct strftime('%Y-%m-%d', date(DiveDate))) '#dpd',
+    cast(round(min(MaxDepth)) as integer) min_mt,
+    cast(round(avg(MaxDepth)) as integer) avg_mt,
+    cast(round(max(MaxDepth)) as integer) max_mt,
+    cast(round(min(Duration)) as integer) min_s,
+    cast(round(avg(Duration)) as integer) avg_s,
+    cast(round(max(Duration)) as integer) max_s
+  from FreeDive
+  group by Year
+  order by Year
+  " | sqlite3 "$db_file_name" | sd '^' '    '
+}
+
 report () {
 
     echo "
@@ -255,7 +279,7 @@ report () {
     "
 
     echo ".mode columns
-    -- Dayly Report: Top ApneaTime
+    -- Daily Report: Top ApneaTime
     select DiveDate, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
     from FreeDive
     join (
@@ -281,7 +305,7 @@ report () {
     "
 
     echo ".mode columns
-    -- Dayly Report: Top MaxDepth
+    -- Daily Report: Top MaxDepth
     select DiveDate, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
     from FreeDive
     join (
@@ -307,7 +331,7 @@ report () {
     "
 
     echo ".mode columns
-    -- Dayly Report: Top AvgDepth
+    -- Daily Report: Top AvgDepth
     select DiveDate, ApneaTime, AvgDepth, MaxDepth, Temperature, Serie
     from FreeDive
     join (
@@ -448,6 +472,8 @@ report () {
     from FreeDive
     " | sqlite3 "$db_file_name" | tail +3`
     print_graph "$rows" "$max" "    "
+
+    stats_per_year
 
     deepest_dive 2023
 

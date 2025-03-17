@@ -41,7 +41,7 @@ ACTIONS:
   mr <new commit/branch name>
     commits and pushes the staged changes to a new branch
 
-  stash-unstaged <stash name>
+  stash_unstaged <stash name>
     stashes the unstaged changes
 
   checkout <branch name>
@@ -145,7 +145,10 @@ mr() {
 
 stash_unstaged() {
   # if $1 is empty print the help and exit
-  if [ -z "$1" ]; then wrong_syntax; fi
+  if [ -z "$1" ]; then
+    error "you need to specify the stash name: igit stash_unstaged '<stash name>'"
+    exit 2
+  fi
 
   path="$1"
   info "git commit -m 'temp'" && \
@@ -256,7 +259,7 @@ case "$1" in
     diff ${@:2} ;;
   "mr")
     mr "$2" ;;
-  "stash-unstaged")
+  "stash_unstaged")
     stash_unstaged "$2" ;;
   "checkout")
     checkout "$2" ;;

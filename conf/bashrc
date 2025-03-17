@@ -65,6 +65,31 @@ function okko {
   fi
 }
 
+function lo {
+  if [ -z "$1" ]; then # if no arguments
+    echo "🐙 what I should run?"
+    fd --type x . localhost
+    return
+  fi
+
+  if [ ! -d "localhost" ]; then
+    echo "🐙 localhost folder not found"
+    echo "🐙 :("
+    return
+  fi
+
+  local_script="$(fd --type x "$1" localhost | head -n 1)"
+  
+  if [ ! -f "$local_script" ]; then # if there is no matching file in the ./localhost folder
+    echo "🐙 the localhost folder does not contain anything that matches '$1'"
+    echo "🐙 :("
+    return
+  fi
+
+  echo "🐙 executing local script: $local_script ${@:2}"
+  "$local_script" ${@:2}
+}
+
 # sets the terminal title
 function title {
   if [ "$1" == "--help" ] || [ "$1" == "-help" ] || [ "$1" == "-h" ]; then
@@ -227,10 +252,10 @@ function sqcli {
 
 function sqclip {
   echo
-  clip_cat | bp -l sql
+  xclip -selection c -o | bat -pp -l sql
   echo
   echo ".mode column
-  $(clip_cat)
+  $(xclip -selection c -o)
   " | sqlite3 $1
 }
 
@@ -260,6 +285,8 @@ alias commands='show_alias commands; compgen -abckA function | sort -u'
 alias bp='bat -pp'
 alias trash='gio trash'
 alias trim='sed '"'"'s/^ *//;s/ *$//'"'"
+alias to_lower_case="tr '[:upper:]' '[:lower:]'"
+alias to_upper_case="tr '[:lower:]' '[:upper:]'"
 alias npm_audit_high='show_alias npm_audit_high; npm audit | grep -B 1 -A 10 High'
 alias docker_ps='show_alias docker_ps; docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
 alias apt_history="show_alias apt_history; zcat /var/log/apt/history.log.*.gz | cat - /var/log/apt/history.log | sd ' \([^)]+\)' '' | sd ':amd64' '' | sd ',' '' | rg -i 'install|upgrade|remove|purge'"
@@ -306,7 +333,7 @@ alias clima='clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p' # markdow
 alias mocp='mocp -T dark'
 alias mp='mousepad'
 alias code='codium-insiders'
-alias codews='show_alias codews; codium-insiders . && title && sleep 1 && xdotool search --name ".*${PWD##*/}.*vscodium.*" windowsize 2129 1362'
+alias codews='show_alias codews; codium-insiders . && title && sleep 1 && xdotool search --name ".*${PWD##*/}.*vscodium.*" windowmove 610 70 windowsize 1950 1360'
 alias search='show_alias search; banner search && rg --sort=path'
 alias hg='show_alias hg; history | rg'
 
@@ -348,6 +375,7 @@ google-chrome \
 ### GIT config by env vars
 # @see https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables
 export GIT_PAGER=riff
+export GIT_EDITOR=hx
 
 ### PATH
 export PATH="$PATH:$HOME/bin:$STUFF_PATH/sh:$STUFF_PATH/zx:$STUFF_PATH/nodejs"
