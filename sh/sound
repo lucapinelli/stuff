@@ -23,7 +23,8 @@ project_path="$(dirname $script_path)"
 
 case $1 in
   error_6|powerup_success|tada_fanfare_g)
-    paplay --volume=32000 "$project_path/resources/sound/$1.ogg"
+    # paplay --volume=32000 "$project_path/resources/sound/$1.ogg" # not installed by default
+    ffplay -nodisp -autoexit -volume 15 -loglevel error "$project_path/resources/sound/$1.ogg"
   ;;
   *)
     echo "$HELP"
