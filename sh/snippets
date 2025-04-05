@@ -31,6 +31,9 @@ ACTIONS:
   s, show
     shows all the snippets with a name that matches the pattern
 
+  cl, clima
+    shows all the snippets with a name that matches the pattern using clima
+
   c, clip
     copies in the clipboard the first snippet with a name that matches the
     pattern
@@ -100,6 +103,12 @@ case "$1" in
   ;;
   "show" | "s")
     fd --type f ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" --exec-batch bat --style=header --paging never
+  ;;
+  "clima" | "cl")
+    for file in $(fd --type f ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME"); do
+      echo -e "\n🐙\033[01m File: ${file}\n\033[00m"
+      /home/luca/.cargo/bin/clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p "${file}"
+    done
   ;;
   "clip" | "c")
     xclip -sel c -i "$(fd ${@:2:$#-2} "${@: -1}" "$SNIPPETS_HOME" | head -1)"

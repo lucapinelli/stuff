@@ -259,18 +259,6 @@ function sqclip {
   " | sqlite3 $1
 }
 
-function wsearch {
-  # blue with prefix '⚙'
-  echo -e "\033[00;34m⚙ xdotool search --onlyvisible --name '$1' getwindowname \033[00m"
-  xdotool search --onlyvisible --name "$1" getwindowname
-}
-
-function wresize {
-  # blue with prefix '⚙'
-  echo -e "\033[00;34m⚙ xdotool search --onlyvisible --name '$1'  windowmove 610 70 windowsize 1950 1360 \033[00m"
-  xdotool search --onlyvisible --name "$1" windowmove 610 70 windowsize 1950 1360
-}
-
 ### Alias
 
 alias ..='cd ..'
@@ -333,7 +321,7 @@ alias clima='clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p' # markdow
 alias mocp='mocp -T dark'
 alias mp='mousepad'
 alias code='codium-insiders'
-alias codews='show_alias codews; codium-insiders . && title && sleep 1 && xdotool search --name ".*${PWD##*/}.*vscodium.*" windowmove 610 70 windowsize 1950 1360'
+alias codews='show_alias codews; codium-insiders . && title && sleep 1 && wmctrl -r "${PWD##*/} - vscodium" -e 0,610,70,1950,1370'
 alias search='show_alias search; banner search && rg --sort=path'
 alias hg='show_alias hg; history | rg'
 
