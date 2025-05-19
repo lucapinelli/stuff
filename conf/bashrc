@@ -259,6 +259,38 @@ function sqclip {
   " | sqlite3 $1
 }
 
+function localai {
+  (
+  set -x
+  model_name="$1"
+  prompt="$2"
+  
+  api_url="http://127.0.0.1:11434/v1/chat/completions" # for the base URL see `ollama ps --help`
+  curl -d '{"model": "'"$model_name"'", "messages": [{"role": "user", "content": "'"$prompt"'"}]}' "$api_url" | xclip -selection c -i
+  
+  xclip -selection c -o
+
+  xclip -selection c -o | jq
+  
+  xclip -selection c -o | jq -r .choices[0].message.content
+  )
+}
+
+function gemma {
+  local user_prompt
+
+  # Check if an argument is provided
+  if [ -n "$1" ]; then
+    # Argument is provided
+    user_prompt="$1"
+  else
+    # No argument provided, assume piped input
+    user_prompt=$(cat)  # Or use 'read' in a loop if you need to process line by line
+  fi
+
+  localai "gemma3:4b" "$user_prompt"
+}
+
 ### Alias
 
 alias ..='cd ..'
@@ -318,10 +350,10 @@ alias yt-mp3='show_alias yt-mp3; yt-dlp --extract-audio --audio-format mp3'
 alias render_html='lynx --stdin -dump -width 160'
 alias weather='show_alias weather; curl wttr.in'
 alias clima='clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p' # markdown viewer
-alias mocp='mocp -T dark'
+#alias mocp='mocp -T dark'
 alias mp='mousepad'
 alias code='codium-insiders'
-alias codews='show_alias codews; codium-insiders . && title && sleep 1 && wmctrl -r "${PWD##*/} - vscodium" -e 0,610,70,1950,1370'
+alias codews='show_alias codews; codium-insiders . && title && sleep 1 && wmctrl -r "${PWD##*/} - vscodium" -e 0,570,70,1990,1370'
 alias search='show_alias search; banner search && rg --sort=path'
 alias hg='show_alias hg; history | rg'
 
@@ -348,6 +380,7 @@ alias dbhistory='history | awk '"'"'
 { if (db_cmd == "true") print $0 }
 '"'"' '
 
+alias amic24='show_alias amic24; amixer set Capture 24%'
 alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -framerate 8 -f x11grab -i :0+0:0 -video_size 1920x1080'
 alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'
 alias ffdisplay2small='show_alias ffdisplay2small; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 1920x1080'
