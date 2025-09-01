@@ -122,6 +122,7 @@ case "$1" in
   ;;
   "ide")
     cd "$SNIPPETS_HOME"
+    title
     "$IDE" .
   ;;
   *)
