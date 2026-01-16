@@ -41,8 +41,8 @@ ACTIONS:
   mr <new commit/branch name>
     commits and pushes the staged changes to a new branch
 
-  stash_unstaged <stash name>
-    stashes the unstaged changes
+  stash <staged|unstaged> <stash name>
+    stashes the staged or the unstaged changes
 
   checkout <branch name>
     stashes the local changes, checkouts the branch, updates it and pop the stash
@@ -76,14 +76,13 @@ wrong_syntax () {
 }
 
 status() {
-  info "git status -sb"
-  git status -sb
-  info "git cherry -v # lists local commits that require a push"
-  git cherry -v
-  info "git stash list"
-  git stash list
-  info "git branch"
-  git branch
+  (
+    set -x # print each command before executing it
+    git status -sb
+    git cherry -v # lists local commits that require a push
+    git stash list
+    git branch
+  )
 }
 
 pull() {
@@ -107,11 +106,13 @@ push() {
     error "you need to specify the commit message"
     exit 1
   fi
-
-  info "git pull && git commit -m "'"'"$1"'"'" && git push"
-  git pull && git commit -m "$1" && git push
-  info "git status"
-  git status
+  (
+    set -x # print each command before executing it
+    git pull
+    git commit -m "$1"
+    git push
+    git status
+  )
 }
 
 log() {
@@ -125,8 +126,10 @@ log() {
 }
 
 diff() {
-  info "git difftool --tool=meld --dir-diff $@"
-  git difftool --tool=meld --dir-diff $@;
+  (
+    set -x # print each command before executing it
+    git difftool --tool=meld --dir-diff $@;
+  )
 }
 
 mr() {
@@ -135,30 +138,67 @@ mr() {
 
   commit="$1"
   branch="$(echo $1 | sd ' ' '-')"
-  info "git checkout -b $branch" && \
-  git checkout -b $branch && \
-  info "git commit -m $commit" && \
-  git commit -m "$commit" && \
-  info "git push --set-upstream origin $branch" && \
-  git push --set-upstream origin $branch;
+
+  (
+    set -x # print each command before executing it
+    git checkout -b $branch && \
+    git commit -m "$commit" && \
+    git push --set-upstream origin $branch;
+  )
 }
 
 stash_unstaged() {
   # if $1 is empty print the help and exit
   if [ -z "$1" ]; then
-    error "you need to specify the stash name: igit stash_unstaged '<stash name>'"
+    error "you need to specify the stash name: igit stash unstaged '<stash name>'"
     exit 2
   fi
 
-  path="$1"
-  info "git commit -m 'temp'" && \
-  git commit -m 'temp' && \
-  info "git stash save \"$1\"" && \
-  git stash save "$1" && \
-  info "git reset HEAD^1" && \
-  git reset HEAD^1 && \
-  info "git add ." && \
-  git add .
+  (
+    set -x # print each command before executing it
+    git commit -m 'temp' && \
+    git stash save "$1" && \
+    git reset HEAD^1 && \
+    git add .
+  )
+}
+
+stash_staged() {
+  # if $1 is empty print the help and exit
+  if [ -z "$1" ]; then
+    error "you need to specify the stash name: igit stash staged '<stash name>'"
+    exit 2
+  fi
+
+  (
+    set -x # print each command before executing it
+    git commit -m 'staged'
+    git stash save "unstaged"
+    git reset HEAD^1
+    git add .
+    git stash save "$1" # <stash name>
+    git stash list | rg '^stash@\{1\}.*unstaged$' # verify that stash@{1} is the "unstaged"
+    git stash pop stash@{1} # pop 'unstaged'
+  )
+}
+
+stash() {
+  # if $1 is empty print the help and exit
+  if [ -z "$1" ]; then
+    error "you need to specify the stash name: igit stash staged '<stash name>'"
+    exit 2
+  fi
+
+  case "$1" in
+    "staged")
+      stash_staged "$2" ;;
+    "unstaged")
+      stash_unstaged "$2" ;;
+    *)
+      error "you need to specify if you want to stash the staged or the unstaged"
+      exit 2
+      ;;
+  esac
 }
 
 checkout() {
@@ -166,14 +206,13 @@ checkout() {
   if [ -z "$1" ]; then wrong_syntax; fi
 
   branchName="$1"
-  info "git stash" && \
-  git stash && \
-  info "git checkout $branchName" && \
-  git checkout $branchName && \
-  info "git pull" && \
-  git pull && \
-  info "git stash pop" && \
-  git stash pop
+  (
+    set -x # print each command before executing it
+    git stash
+    git checkout "$branchName"
+    git pull
+    git stash pop
+  )
 }
 
 restore() {
@@ -181,14 +220,13 @@ restore() {
   if [ -z "$1" ]; then wrong_syntax; fi
 
   paths="$@"
-  info "git reset HEAD $paths" && \
-  git reset HEAD $paths && \
-  info "git add $paths" && \
-  git add $paths && \
-  info "git reset HEAD $paths" && \
-  git reset HEAD $paths && \
-  info "git checkout $paths" && \
-  git checkout $paths
+  (
+    set -x # print each command before executing it
+    git reset HEAD $paths
+    git add $paths
+    git reset HEAD $paths
+    git checkout $paths
+  )
 }
 
 apply() {
@@ -196,8 +234,10 @@ apply() {
   if [ -z "$1" ]; then wrong_syntax; fi
 
   patch_file="$1"
-  info "git apply --3way --ignore-space-change --ignore-whitespace \"$patch_file\"" && \
-  git apply --3way --ignore-space-change --ignore-whitespace "$patch_file"
+  (
+    set -x # print each command before executing it
+    git apply --3way --ignore-space-change --ignore-whitespace "$patch_file"
+  )
 }
 
 list() {
@@ -259,6 +299,8 @@ case "$1" in
     diff ${@:2} ;;
   "mr")
     mr "$2" ;;
+  "stash")
+    stash "$2" "$3" ;;
   "stash_unstaged")
     stash_unstaged "$2" ;;
   "checkout")

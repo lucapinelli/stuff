@@ -353,7 +353,7 @@ alias clima='clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p' # markdow
 #alias mocp='mocp -T dark'
 alias mp='mousepad'
 alias code='codium-insiders'
-alias codews='show_alias codews; codium-insiders . && title && sleep 1 && wmctrl -r "${PWD##*/} - vscodium" -e 0,570,70,1990,1370'
+alias ide='show_alias ide; codium-insiders . && title && sleep 1 && wmctrl -r "${PWD##*/} - vscodium" -e 0,570,70,1990,1370'
 alias search='show_alias search; banner search && rg --sort=path'
 alias hg='show_alias hg; history | rg'
 
@@ -381,6 +381,7 @@ alias dbhistory='history | awk '"'"'
 '"'"' '
 
 alias amic24='show_alias amic24; amixer set Capture 24%'
+alias amic64='show_alias amic64; amixer set Capture 64%'
 alias ffdisplay1='show_alias ffdisplay1; ffplay -window_title "Display 1" -framerate 8 -f x11grab -i :0+0:0 -video_size 1920x1080'
 alias ffdisplay2='show_alias ffdisplay2; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 2560x1440'
 alias ffdisplay2small='show_alias ffdisplay2small; ffplay -window_title "Display 2" -framerate 8 -f x11grab -i :0+1920:0 -video_size 1920x1080'
@@ -392,6 +393,27 @@ google-chrome \
   --ignore-certificate-errors \
   --unsafely-treat-insecure-origin-as-secure=https://localhost
 '
+alias grok='show_alias grok; opencode'
+
+alias jaba="
+mkdir -p /tmp/jaba
+cd /tmp/jaba
+title
+touch draft.md
+touch draft.js
+touch draft.sql
+echo '
+## Log error levels
+
+| 60 | fatal |
+| 50 | error |
+| 40 | warn  |
+| 30 | info  |
+| 20 | debug |
+| 10 | trace |
+' > pino.md
+pulsar .
+"
 
 ### GIT config by env vars
 # @see https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables

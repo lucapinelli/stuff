@@ -46,11 +46,11 @@ configure_webcam () {
     v4l2-ctl -d $webcam -c saturation=0 # BW
   else
     set -x # print each command before executing it
-    v4l2-ctl -d $webcam -c saturation=32 # color
+    v4l2-ctl -d $webcam -c saturation=24 # color
   fi
 
-  v4l2-ctl -d $webcam -c brightness=32
-  v4l2-ctl -d $webcam -c contrast=32
+  v4l2-ctl -d $webcam -c brightness=24
+  v4l2-ctl -d $webcam -c contrast=24
   v4l2-ctl -d $webcam -c hue=0
   # v4l2-ctl -d $webcam -c gain=0
   v4l2-ctl -d $webcam -c sharpness=0
