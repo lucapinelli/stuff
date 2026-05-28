@@ -32,11 +32,14 @@ ACTIONS:
     pull, commit and push
 
   log [search pattern]
-    if text-filter is not specified logs the lasts 60 commits,
+    if [search pattern] is not specified logs the lasts 60 commits,
     otherwise show all the commits that matches the given pattern
 
-  diff [git diff options]
+  meld [git diff options]
     shows the diffs using Meld
+
+  difft [git diff options]
+    shows the diffs using Difftastic
 
   mr <new commit/branch name>
     commits and pushes the staged changes to a new branch
@@ -86,10 +89,12 @@ status() {
 }
 
 pull() {
-  info "git pull"
-  git pull
+  (
+    set -x # print each command before executing it
+    git pull
+  )
   status
-  info "git fetch --dry-run --prune # list removed branches"
+  info "list removed branches :: git fetch --dry-run --prune"
   removed=$(git fetch --dry-run --prune 2>&1)
   if [ -n "${removed}" ]; then
     info "Removed branches:\n${removed}"
@@ -117,18 +122,30 @@ push() {
 
 log() {
   if [ -z "$1" ]; then # if $1 is empty
-    info "git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --max-count=60 | grep -v 'Merge' | tac"
-    git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --max-count=60 | grep -v 'Merge' | tac
+    (
+      set -x # print each command before executing it
+      git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --grep="^Merge " --invert-grep --max-count=60 | tac
+    )
   else
-    info "git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M'  | grep -e \"$1\" | grep -v 'Merge' | tac"
-    git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M'  | grep -e "$1" | grep -v 'Merge' | tac
+    (
+      set -x # print each command before executing it
+      git log --format='%ad %h %aE %s' --date='format:%Y.%m.%d %H:%M' --grep="^Merge " --invert-grep | rg -i "$1" | tac
+    )
   fi
 }
 
-diff() {
+meld() {
   (
     set -x # print each command before executing it
     git difftool --tool=meld --dir-diff $@;
+  )
+}
+
+difft() {
+  (
+    info "@see https://difftastic.wilfred.me.uk/git.html for more usage of difftastic"
+    set -x # print each command before executing it
+    git -c diff.external=difft diff $@;
   )
 }
 
@@ -157,6 +174,7 @@ stash_unstaged() {
   (
     set -x # print each command before executing it
     git commit -m 'temp' && \
+    git add .
     git stash save "$1" && \
     git reset HEAD^1 && \
     git add .
@@ -295,14 +313,14 @@ case "$1" in
     push "$2" ;;
   "log")
     log "$2" ;;
-  "diff")
-    diff ${@:2} ;;
+  "meld")
+    meld ${@:2} ;;
+  "difft")
+    difft ${@:2} ;;
   "mr")
     mr "$2" ;;
   "stash")
     stash "$2" "$3" ;;
-  "stash_unstaged")
-    stash_unstaged "$2" ;;
   "checkout")
     checkout "$2" ;;
   "restore")

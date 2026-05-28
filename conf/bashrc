@@ -79,7 +79,7 @@ function lo {
   fi
 
   local_script="$(fd --type x "$1" localhost | head -n 1)"
-  
+
   if [ ! -f "$local_script" ]; then # if there is no matching file in the ./localhost folder
     echo "🐙 the localhost folder does not contain anything that matches '$1'"
     echo "🐙 :("
@@ -264,14 +264,14 @@ function localai {
   set -x
   model_name="$1"
   prompt="$2"
-  
+
   api_url="http://127.0.0.1:11434/v1/chat/completions" # for the base URL see `ollama ps --help`
   curl -d '{"model": "'"$model_name"'", "messages": [{"role": "user", "content": "'"$prompt"'"}]}' "$api_url" | xclip -selection c -i
-  
+
   xclip -selection c -o
 
   xclip -selection c -o | jq
-  
+
   xclip -selection c -o | jq -r .choices[0].message.content
   )
 }
@@ -352,8 +352,7 @@ alias weather='show_alias weather; curl wttr.in'
 alias clima='clima --skin ${STUFF_PATH}/conf/clima/skin_luca.hjson -p' # markdown viewer
 #alias mocp='mocp -T dark'
 alias mp='mousepad'
-alias code='codium-insiders'
-alias ide='show_alias ide; codium-insiders . && title && sleep 1 && wmctrl -r "${PWD##*/} - vscodium" -e 0,570,70,1990,1370'
+alias ide='show_alias ide; codium . && title && sleep 1 && wmctrl -r "${PWD##*/} - vscodium" -e 0,570,32,1990,1408'
 alias search='show_alias search; banner search && rg --sort=path'
 alias hg='show_alias hg; history | rg'
 
@@ -393,7 +392,10 @@ google-chrome \
   --ignore-certificate-errors \
   --unsafely-treat-insecure-origin-as-secure=https://localhost
 '
-alias grok='show_alias grok; opencode'
+alias grok='show_alias grok; prompt && opencode -m xai/grok-4.3'
+alias qwen='show_alias qwen; prompt && opencode -m ollama/qwen2.5-coder'
+
+alias prompt='show_alias prompt; pulsar ~/prompt'
 
 alias jaba="
 mkdir -p /tmp/jaba
