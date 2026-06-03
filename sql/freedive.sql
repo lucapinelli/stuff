@@ -31,7 +31,7 @@ from freedive
 where DiveDate between '2024-07-09' and '2024-07-10'
 order by DiveDate
 
--- dayly report
+-- daily report
 select Year, Month, Day, max(Duration) max_duration, max(MaxDepth) max_depth
 from freedive
 group by Year, Month, Day
