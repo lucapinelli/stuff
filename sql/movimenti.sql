@@ -2,7 +2,7 @@
 select tipo, prodotto, data_inizio, descrizione, importo, costo, valuta, stato
 from movimenti
 where costo > 0
-  and data_completamento <> '' -- pagameto completato (non annullato)
+	and stato = 'COMPLETATO'
   and descrizione not like '%interessi %instant access savings%'
 
 -- annullati (non completati)
