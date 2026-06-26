@@ -1,0 +1,7 @@
+{
+  "globals": {
+    "$": "readonly",
+    "argv": "readonly",
+    "question": "readonly"
+  }
+}

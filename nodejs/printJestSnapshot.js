@@ -15,7 +15,7 @@ Examples:
 2. printJestSnapshot file=./src/service/__snapshots__/processService.test.js.snap | xclip -selection clipboard
 `
 
-const getArg = (argName) => {
+const getArg = argName => {
   const arg = process.argv.find(arg => arg.startsWith(argName + '='))
   if (!arg) {
     return null
@@ -24,7 +24,10 @@ const getArg = (argName) => {
 }
 
 const filePath = getArg('file')
-if (!filePath || process.argv.find(arg => arg === 'help' || arg === '--help' || arg === '-help' || arg === '-h')) {
+if (
+  !filePath ||
+  process.argv.find(arg => arg === 'help' || arg === '--help' || arg === '-help' || arg === '-h')
+) {
   console.log(help)
   process.exit()
 }
@@ -34,10 +37,14 @@ const snapshot = stdinBuffer.toString()
 
 exports = {}
 
-eval(snapshot)
+eval(snapshot) // oxlint-disable-line no-eval
 
-const output = Object.entries(exports).map(([key, value]) => {
-  return '\n-- ###### ' + key + ' ######\n\n' + value.substring(2, value.length - 2).replace(/\\/g, '')
-}).join('\n')
+const output = Object.entries(exports)
+  .map(([key, value]) => {
+    return (
+      '\n-- ###### ' + key + ' ######\n\n' + value.substring(2, value.length - 2).replace(/\\/g, '')
+    )
+  })
+  .join('\n')
 
 console.log(output)

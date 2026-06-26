@@ -1,8 +1,6 @@
 #!/usr/bin/env zx
 // zx version 4.2.0
 
-/* global argv, question, $ */
-
 const showHelp = () => {
   console.info(`
 USAGE:
@@ -22,7 +20,7 @@ const forEach = async (list, asyncFn) => {
   }
 }
 
-const generateMeta = (file) => {
+const generateMeta = file => {
   const dashIndex = file.indexOf('-')
   const dotIndex = file.lastIndexOf('.')
   if (dashIndex < 0 || dotIndex < 0) {
@@ -47,10 +45,9 @@ const main = async () => {
     }
     console.info(file, '::', { artist, title })
   })
-  const proceed = await question(
-    '\nDo you want to tag the files [y/n] (default n)? ',
-    { choices: ['y', 'n'] }
-  )
+  const proceed = await question('\nDo you want to tag the files [y/n] (default n)? ', {
+    choices: ['y', 'n'],
+  })
   if (proceed !== 'y') {
     console.info('terminated.')
     return

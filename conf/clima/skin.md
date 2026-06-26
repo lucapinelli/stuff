@@ -118,7 +118,7 @@ It's also possible to change all default headers with a shortened syntax. The ex
 |horizontal-rule, horizontal_rule, rule|character|
 |:-:|:-:|:-|
 
-----
+---
 
 ### Quotes
 

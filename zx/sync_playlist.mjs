@@ -1,8 +1,6 @@
 #!/usr/bin/env zx
 // zx version 4.2.0
 
-/* global argv, question, $ */
-
 $.verbose = false
 
 const showHelp = () => {
@@ -45,10 +43,9 @@ const main = async () => {
     return
   }
 
-  const proceed = await question(
-    '\nDo you want to proceed [y/n] (default n)? ',
-    { choices: ['y', 'n'] }
-  )
+  const proceed = await question('\nDo you want to proceed [y/n] (default n)? ', {
+    choices: ['y', 'n'],
+  })
   if (proceed !== 'y') {
     console.info('Terminated.')
     return

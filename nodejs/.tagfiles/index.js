@@ -17,7 +17,7 @@ options:
   --exception-only  do not print stdout and stderr but just exceptions.
 `
 
-async function asyncSeries (values, asyncCallback) {
+async function asyncSeries(values, asyncCallback) {
   const index = 0
   await values.reduce(async (promise, value) => {
     await promise
@@ -35,14 +35,20 @@ const main = async () => {
   const exceptionOnly = options.has('--exception-only')
 
   const files = fs.readdirSync('.')
-  asyncSeries(files, async (file) => {
+  asyncSeries(files, async file => {
     const mimeType = mime.getType(file)
     const index = file.indexOf('-')
     const lastIndex = file.lastIndexOf('.')
     if (mimeType && mimeType.startsWith('audio/') && index > 0 && lastIndex > index) {
       // .replace(/[\u0250-\ue007]/g, '') removes not latin characters
-      const author = file.substring(0, index).trim().replace(/[\u0250-\ue007]/g, '')
-      const title = file.substring(index + 1, lastIndex).trim().replace(/[\u0250-\ue007]/g, '')
+      const author = file
+        .substring(0, index)
+        .trim()
+        .replace(/[\u0250-\ue007]/g, '')
+      const title = file
+        .substring(index + 1, lastIndex)
+        .trim()
+        .replace(/[\u0250-\ue007]/g, '')
       const command = `eyeD3 -a "${author}" -t "${title}" "${file}"`
       console.log('\n', command, '\n')
       try {

@@ -19,7 +19,7 @@ const usage = `
 
 `
 
-async function asyncSeries (values, asyncCallback) {
+async function asyncSeries(values, asyncCallback) {
   const index = 0
   await values.reduce(async (promise, value) => {
     await promise
@@ -30,22 +30,20 @@ async function asyncSeries (values, asyncCallback) {
 const main = async () => {
   if (
     process.argv.length !== 3 ||
-      process.argv[2] === '--help' ||
-      process.argv[2] === '-help' ||
-      process.argv[2] === '-h'
+    process.argv[2] === '--help' ||
+    process.argv[2] === '-help' ||
+    process.argv[2] === '-h'
   ) {
     console.log(usage)
     return
   }
 
   const files = fs.readdirSync('.')
-  asyncSeries(files, async (file) => {
+  asyncSeries(files, async file => {
     const stat = fs.statSync(file)
     const cmd = process.argv[2]
     if (stat.isFile()) {
-      const command = cmd.includes('{}')
-        ? cmd.replace(/{}/g, file)
-        : `${cmd} "${file}"`
+      const command = cmd.includes('{}') ? cmd.replace(/{}/g, file) : `${cmd} "${file}"`
       try {
         console.log('EXECUTE: ', command)
         const out = await exec(command)

@@ -24,7 +24,6 @@ function rust_run {
 
 ### find -exec
 
-
 ```bash
 find . -exec grep chrome "{}" \;
 # or

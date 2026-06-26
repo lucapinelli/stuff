@@ -55,21 +55,21 @@ while (longerKey.length < length) {
   const min = Math.min(...counters)
   const max = Math.max(...counters)
   let char
-  if (min < (max / 11)) {
+  if (min < max / 11) {
     const shorter = key.filter(char => charCounter[char] < max / 3)
     index = (index + loop + shorter[index % shorter.length].charCodeAt(0)) % shorter.length
     char = shorter[index]
     if (char === longerKey.at(-1) && char === longerKey.at(-2) && char === longerKey.at(-3)) {
       const alpha = alphabet.filter(c => c !== char)
-      index = ((index + loop) + alpha[loop % alphabet.length].charCodeAt(0)) % alpha.length
+      index = (index + loop + alpha[loop % alphabet.length].charCodeAt(0)) % alpha.length
       char = alpha[index]
     } else {
       if (char === longerKey.at(-1) && char === longerKey.at(-2)) {
         char = shorter[loop % shorter.length]
       }
     }
-  } else if (loop % 23 === 0 && loop % 29 !== 0 && min < (max / 3)) {
-    index = ((index * loop) + alphabet[loop % alphabet.length].charCodeAt(0)) % alphabet.length
+  } else if (loop % 23 === 0 && loop % 29 !== 0 && min < max / 3) {
+    index = (index * loop + alphabet[loop % alphabet.length].charCodeAt(0)) % alphabet.length
     char = alphabet[index]
   } else {
     index = (index + key[index % key.length].charCodeAt(0)) % key.length

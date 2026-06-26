@@ -2,26 +2,29 @@
   "name": "stuff",
   "version": "1.0.0",
   "description": "Scripts and notes about stuff that I use often.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "homepage": "https://github.com/lucapinelli/stuff#readme",
+  "bugs": {
+    "url": "https://github.com/lucapinelli/stuff/issues"
   },
+  "license": "ISC",
+  "author": "Luca Pinelli",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lucapinelli/stuff.git"
   },
-  "author": "Luca Pinelli",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/lucapinelli/stuff/issues"
+  "main": "index.js",
+  "scripts": {
+    "lint:code": "oxlint",
+    "lint:fmt": "oxfmt --check .",
+    "lint:spell": "cspell --verbose conf nodejs resources sh zx package.json README.md .*.js .*.json",
+    "lint": "npm run lint:code && npm run lint:fmt && npm run lint:spell && echo '✅ All good 🤓'",
+    "lint:code:fix": "oxlint --fix",
+    "lint:fmt:fix": "oxfmt ."
   },
-  "homepage": "https://github.com/lucapinelli/stuff#readme",
   "devDependencies": {
     "@cspell/dict-it-it": "^3.1.6",
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0"
+    "cspell": "^10.0.1",
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0"
   }
 }

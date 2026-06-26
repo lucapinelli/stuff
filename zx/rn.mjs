@@ -1,8 +1,6 @@
 #!/usr/bin/env zx
 // zx version 4.2.0
 
-/* global $ */
-
 const minimist = require('minimist')
 
 const printInfo = () => {
@@ -29,13 +27,10 @@ const printHelp = () => {
   process.exit(0)
 }
 
-const args = minimist(
-  process.argv.slice(3),
-  {
-    boolean: ['simulate', 'debug', 'verbose', 'help', 'info'],
-    string: ['fd']
-  }
-)
+const args = minimist(process.argv.slice(3), {
+  boolean: ['simulate', 'debug', 'verbose', 'help', 'info'],
+  string: ['fd'],
+})
 const [search, replace, unknown] = args._
 const { simulate, fd, debug, verbose, help, info } = args
 $.verbose = verbose
@@ -54,11 +49,18 @@ const log = {
     }
   },
   info: console.info,
-  error: console.error
+  error: console.error,
 }
 
 log.debug('🤖 args %j', {
-  simulate, fd, debug, verbose, help, info, search, replace
+  simulate,
+  fd,
+  debug,
+  verbose,
+  help,
+  info,
+  search,
+  replace,
 })
 
 // the main is implemented only to remove the eslint fatal error "Cannot use keyword 'await' outside an async function"
@@ -68,7 +70,8 @@ const main = async () => {
     if (!list.length && fd) {
       log.info('🤖 no files matches the fd filter.')
     }
-    let file = null; let rename = null
+    let file = null
+    let rename = null
     for (let i = 0; i < list.length; ++i) {
       file = list[i]
       rename = file.replace(new RegExp(search), replace)
@@ -81,8 +84,8 @@ const main = async () => {
       }
     }
   } catch (error) {
-    error.stdout && log.info('🤖 out :: ', error.stdout)
-    error.stderr && log.error('🤖 error ::', error.stderr)
+    if (error.stdout) log.info('🤖 out :: ', error.stdout)
+    if (error.stderr) log.error('🤖 error ::', error.stderr)
     process.exit(error.exitCode)
   }
 }

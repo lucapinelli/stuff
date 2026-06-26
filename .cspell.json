@@ -4,7 +4,7 @@
   "version": "0.2",
   // language - current active spelling language
   "language": "en,it",
- "import": [
+  "import": [
     "@cspell/dict-it-it/cspell-ext.json" // npm i -D @cspell/dict-it-it
     // import the global configuration
     // "~/.cspell.json"
@@ -66,6 +66,7 @@
     "okko",
     "onlyvisible",
     "oxker",
+    "oxlint",
     "paplay",
     "paramenters",
     "pinelli",
